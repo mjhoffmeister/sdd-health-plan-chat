@@ -17,6 +17,8 @@ Each phase produces durable artifacts that constrain and guide the next phase.
 
 ## For Demoers (jump ahead + rehearse safely)
 
+Current checkpoint: `phase/00-init` (start of init)
+
 ### Phase tags (start-of-phase checkpoints)
 
 This repo uses Git tags to mark the **start** of each demo phase so you can
@@ -51,6 +53,10 @@ Create a dedicated “live” folder you can edit freely:
 
 `git switch -c demo/live phase/00-init`
 
+If you already created `demo/live` before, use:
+
+`git switch demo/live`
+
 `git worktree add ..\sdd-health-plan-chat--live demo/live`
 
 Optional: create a “checkpoint view” folder that you never edit:
@@ -73,6 +79,8 @@ Then rerun init:
 `specify init --here --script ps --ai copilot`
 
 ## Init Phase (Phase 00)
+
+Goal: generate the Spec Kit files so you can begin the constitution phase.
 
 ### 1) Install (or upgrade) the `specify` CLI
 
