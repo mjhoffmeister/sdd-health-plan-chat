@@ -17,7 +17,9 @@ Each phase produces durable artifacts that constrain and guide the next phase.
 
 ## For Demoers (jump ahead + rehearse safely)
 
-Current checkpoint: `phase/00-init` (start of init)
+To see what checkpoint you're on:
+
+`git tag --points-at HEAD`
 
 ### Phase tags (start-of-phase checkpoints)
 
@@ -25,16 +27,17 @@ This repo uses Git tags to mark the **start** of each demo phase so you can
 reset/jump without accidentally “dirtying” a checkpoint.
 
 - `phase/00-init` = starting point before you run `specify init`
+- `phase/01-constitution` = starting point for the constitution phase
 
 More phase tags will be added as the demo is built out.
 
 ### Jump to a phase (fast)
 
-To return to the start of init:
+To return to the start of the constitution phase:
 
 `git fetch --tags`
 
-`git switch --detach phase/00-init`
+`git switch --detach phase/01-constitution`
 
 Tip: using `--detach` avoids accidentally moving a branch pointer while
 presenting.
@@ -51,7 +54,7 @@ From the repo root:
 
 Create a dedicated “live” folder you can edit freely:
 
-`git switch -c demo/live phase/00-init`
+`git switch -c demo/live phase/01-constitution`
 
 If you already created `demo/live` before, use:
 
@@ -61,22 +64,35 @@ If you already created `demo/live` before, use:
 
 Optional: create a “checkpoint view” folder that you never edit:
 
-`git worktree add --detach ..\sdd-health-plan-chat--00-init phase/00-init`
+`git worktree add --detach ..\sdd-health-plan-chat--01-constitution phase/01-constitution`
 
 ### Rehearsal reset (start over quickly)
 
-To run the demo repeatedly, reset your **live** folder back to the start of init
-(this discards any edits in the live folder):
+To run the demo repeatedly, reset your **live** folder back to the start of the
+constitution phase (this discards any edits in the live folder):
 
 `cd ..\sdd-health-plan-chat--live`
 
-`git reset --hard phase/00-init`
+`git reset --hard phase/01-constitution`
 
 `git clean -fd`
 
-Then rerun init:
+Then regenerate the constitution (Copilot Chat):
 
-`specify init --here --script ps --ai copilot`
+`/healthplanchat-constitution`
+
+## Constitution Phase (Phase 01)
+
+Goal: create and ratify the project constitution in
+`.specify/memory/constitution.md`.
+
+In Copilot Chat, run:
+
+`/healthplanchat-constitution`
+
+Then review and refine `.specify/memory/constitution.md`.
+
+If you need to rerun init from scratch, jump back to `phase/00-init`.
 
 ## Init Phase (Phase 00)
 
