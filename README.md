@@ -27,8 +27,8 @@ This repo uses Git tags to mark the **start** of each demo phase so you can
 reset/jump without accidentally “dirtying” a checkpoint.
 
 - `phase/00-init` = starting point before you run `specify init`
-
-More phase tags will be added as the demo is built out.
+- `phase/01-constitution` = starting point for generating the constitution
+- `phase/02-spec` = starting point for generating the first spec
 
 ### Jump to a phase (fast)
 
@@ -116,3 +116,15 @@ In Copilot Chat, run:
 `/healthplanchat-constitution`
 
 Then review and refine the output in `.specify/memory/constitution.md`.
+
+## Spec Phase (Phase 02)
+
+Goal: create the first feature specification in
+`specs/<feature-branch>/spec.md`.
+
+### Generate the spec
+
+This repo includes a reusable Copilot prompt for spec generation. In Copilot
+Chat, run:
+
+`/healthplanchat-specify`
