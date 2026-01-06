@@ -1,50 +1,102 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+
+- Version change: N/A (template) -> 1.0.0
+- Modified principles: N/A (initial adoption)
+- Added sections: Core Principles, Cloud & Identity Constraints,
+	Development Workflow & Quality Gates, Governance
+- Removed sections: N/A (initial adoption)
+- Templates requiring updates:
+	- ✅ updated: .specify/templates/plan-template.md
+	- ✅ no change needed: .specify/templates/spec-template.md
+	- ✅ no change needed: .specify/templates/tasks-template.md
+	- ✅ no change needed: .specify/templates/checklist-template.md
+	- ✅ no change needed: .specify/templates/agent-file-template.md
+- Follow-up TODOs: none
+-->
+
+# Health Plan Chat Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Security and Privacy First (NON-NEGOTIABLE)
+The system MUST treat all inputs as untrusted and validate at boundaries.
+Sensitive data MUST be minimized, protected in transit and at rest, and never
+logged in plaintext. Security reviews MUST be done early (threat modeling,
+abuse cases) and repeated when adding new external integrations.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Rationale: This is a health-plan domain demo; safety and trust are foundational.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. Simplicity and Demo Reliability
+We MUST prefer the simplest design that satisfies the spec and is easy to demo.
+Add components, services, or abstractions ONLY when they materially reduce risk
+or enable a requirement; complexity MUST be justified in the plan.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+Rationale: Demos fail on unnecessary moving parts.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. Testability and Determinism
+Core logic MUST be testable without network access and without real cloud
+dependencies. Time, randomness, and external calls MUST be injectable or
+abstracted behind interfaces. Behavior MUST be deterministic for the same
+inputs (except where explicitly designed otherwise).
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+Rationale: Testability enables confident iteration and repeatable demos.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### IV. Clear Separation of Responsibilities
+UI and server responsibilities MUST be clearly separated. Privileged
+operations (secrets, tokens, external API calls, data access) MUST run on the
+server side. The client MUST NOT require secrets to function.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Rationale: Prevents secret leakage and keeps security boundaries crisp.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### V. Maintainable Engineering Practices
+Code MUST optimize for readability and changeability.
+
+- Prefer clear, boring code over cleverness.
+- Apply SOLID when it improves clarity; avoid over-abstraction.
+- Apply DRY thoughtfully; duplication is acceptable when it is clearer.
+- Prefer minimal ceremony in request handling and endpoint design.
+
+Rationale: The repo is meant to be reused and taught from.
+
+## Cloud and Identity Constraints
+Cloud hosting and managed services SHOULD use Azure.
+
+- Identity SHOULD use managed identity or federated credentials.
+- No secrets (keys, connection strings, tokens) may be committed to the repo.
+- Local development MAY use environment variables or user-secrets.
+
+## Development Workflow and Quality Gates
+
+- Every change MUST be traceable to a spec/plan item.
+- Pull requests MUST include a brief rationale and test/validation notes.
+- New behavior MUST include tests when practical; critical paths MUST be
+	covered by automated tests.
+- Errors MUST be handled deliberately (no silent failures).
+- Logging MUST be structured and avoid sensitive data.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+This constitution is the top-level set of non-negotiable constraints for the
+project. If another document conflicts with this constitution, the constitution
+wins.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+Amendments:
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+- Propose changes via pull request.
+- The PR MUST include: what changes, why it changes, and expected impacts.
+- If the change requires migration, the PR MUST include a migration plan.
+
+Versioning policy:
+
+- MAJOR: incompatible governance change or principle removal/redefinition.
+- MINOR: new principle/section or materially expanded constraints.
+- PATCH: clarifications, wording fixes, or non-semantic refinements.
+
+Compliance review expectations:
+
+- Plans MUST include a "Constitution Check" section that calls out any
+	violations and the justification.
+- Reviewers MUST block merges that violate NON-NEGOTIABLE items unless the
+	constitution is amended first.
+
+**Version**: 1.0.0 | **Ratified**: 2026-01-06 | **Last Amended**: 2026-01-06

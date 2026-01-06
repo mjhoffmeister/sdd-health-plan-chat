@@ -17,7 +17,9 @@ Each phase produces durable artifacts that constrain and guide the next phase.
 
 ## For Demoers (jump ahead + rehearse safely)
 
-Current checkpoint: `phase/00-init` (start of init)
+To see what checkpoint you're on:
+
+`git tag --points-at HEAD`
 
 ### Phase tags (start-of-phase checkpoints)
 
@@ -38,6 +40,9 @@ To return to the start of init:
 
 Tip: using `--detach` avoids accidentally moving a branch pointer while
 presenting.
+
+Note: phase tags are maintained by repo maintainers. If you're extending the
+demo and managing tags, see MAINTAINERS.md.
 
 ### Smoothest live demo: worktrees (multiple phase folders)
 
@@ -97,3 +102,17 @@ Upgrade:
 Run from PowerShell (`pwsh`):
 
 `specify init --here --script ps --ai copilot`
+
+## Constitution Phase (Phase 01)
+
+Goal: create and ratify the project constitution in
+`.specify/memory/constitution.md`.
+
+### Generate the constitution
+
+This repo includes a reusable Copilot prompt for constitution generation.
+In Copilot Chat, run:
+
+`/healthplanchat-constitution`
+
+Then review and refine the output in `.specify/memory/constitution.md`.
