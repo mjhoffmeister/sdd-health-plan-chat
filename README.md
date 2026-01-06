@@ -1,11 +1,12 @@
+
 # Using Spec Kit and GitHub Copilot to Build a Health Plan Chat App
 
 This repository is a staged demo of spec-driven development (SDD) using
 **Spec Kit** and **GitHub Copilot**. It shows how written product intent
-(constitution, spec, plan) can guide implementation so AI-assisted development
+(constitution, spec, plan) guides implementation so AI-assisted development
 stays aligned with requirements, quality, and testability.
 
-It’s organized as a sequence you can present end-to-end, or jump ahead during a
+It's organized as a sequence you can present end-to-end, or jump ahead during a
 live session while still keeping completed, realistic artifacts for earlier
 phases.
 
@@ -17,14 +18,16 @@ Each phase produces durable artifacts that constrain and guide the next phase.
 
 ## For Demoers (jump ahead + rehearse safely)
 
-Current checkpoint: `phase/00-init` (start of init)
+To see what checkpoint you're on:
+
+`git tag --points-at HEAD`
 
 ### Phase tags (start-of-phase checkpoints)
 
-This repo uses Git tags to mark the **start** of each demo phase so you can
-reset/jump without accidentally “dirtying” a checkpoint.
+This repo uses Git tags to mark the start of each demo phase so you can
+reset/jump without accidentally "dirtying" a checkpoint.
 
-- `phase/00-init` = starting point before you run `specify init`
+- `phase/00-init` = start of init (before you run `specify init`)
 
 More phase tags will be added as the demo is built out.
 
@@ -49,7 +52,7 @@ From the repo root:
 
 `git fetch --tags`
 
-Create a dedicated “live” folder you can edit freely:
+Create a dedicated "live" folder you can edit freely:
 
 `git switch -c demo/live phase/00-init`
 
@@ -59,14 +62,14 @@ If you already created `demo/live` before, use:
 
 `git worktree add ..\sdd-health-plan-chat--live demo/live`
 
-Optional: create a “checkpoint view” folder that you never edit:
+Optional: create a "checkpoint view" folder that you never edit:
 
 `git worktree add --detach ..\sdd-health-plan-chat--00-init phase/00-init`
 
 ### Rehearsal reset (start over quickly)
 
-To run the demo repeatedly, reset your **live** folder back to the start of init
-(this discards any edits in the live folder):
+To run the demo repeatedly, reset your **live** folder back to the start of
+init (this discards any edits in the live folder):
 
 `cd ..\sdd-health-plan-chat--live`
 
