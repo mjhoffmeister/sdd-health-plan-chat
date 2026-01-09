@@ -7,35 +7,31 @@ description: Generate an implementation plan for Health Plan Chat
 Create an implementation plan for the Health Plan Chat feature described in the
 current feature spec.
 
-This demo plan SHOULD be explicit about technology choices. Capture decisions
-with rationale, alternatives considered, and a rollback path where risk exists.
-
 # Technology Decisions
 
-Use these as defaults unless the spec/constitution requires otherwise. If you
-deviate, explain why and what changes.
+## Versions
+| Component | Version |
+|---|---|
+| .NET | 10 |
+| C# | 14 |
+| AzAPI Terraform provider | 2.8.0 |
 
 ## Backend
 
-- ASP.NET Core minimal Web API using .NET (.NET 10/C#), following a Clean
-  Architecture style.
-- Agent orchestration: Agent Framework (preview is acceptable). Pin the version
-  and explicitly document the risk and rollback path.
-- Azure App Service for hosting the backend API (simple, demo-friendly).
-- Azure AI Foundry for model hosting:
-  - Embeddings: `text-embedding-3-small`
-  - Chat completions: `gpt-5-mini`
+- ASP.NET Core minimal Web API using .NET, following a Clean Architecture style.
+- Agent orchestration: use the lastest preview version of Agent Framework.
+- Azure App Service for hosting the backend API.
+- Azure AI Foundry for AI model hosting. Use text-embedding-3-small global for
+  embeddings and gpt-5-mini global for chat completions.
 - Azure Managed Redis for chat history caching (do not use Azure Cache for
   Redis). See:
   https://learn.microsoft.com/en-us/azure/redis/web-app-aspnet-core-howto?pivots=azure-managed-redis
-- Plan materials ingestion (keep simple): start with synthetic plan JSON files
-  stored in the repo.
-- Optional Azure deployment path: store the synthetic plan JSON docs in Azure
-  Blob Storage and index/retrieve them via Azure AI Search.
+- Azure AI Search for plan material indexing and retrieval, sourced from Azure
+  Blob Storage which stores synthetic plan JSON documents.
 
 ## Frontend
 
-- Blazor WebAssembly using .NET (.NET 10/C#).
+- Blazor WebAssembly.
 - Azure Static Web Apps for hosting the frontend.
 
 ## Data
@@ -44,9 +40,19 @@ deviate, explain why and what changes.
   plan types (HMO, PPO, EPO) and include diverse attributes (coverage details,
   pricing, provider networks). Use Contoso Health as the fictional provider.
 
-## Planning guardrails
+## Security
 
-- Avoid committing secrets. Prefer managed identity for Azure-to-Azure access.
-- Keep local dev straightforward (env vars / user secrets).
-- The plan MUST preserve the spec's separation of grounded answers vs general
-  guidance.
+- Use Managed Identity for all service-to-service authentication.
+- Use anonymous access for the frontend static web app (no users).
+
+## Infrastructure
+
+- Use Infrastructure as Code (IaC) with Terraform for all Azure resources using
+  the AzAPI provider.
+- Create a single demo environment in Azure for hosting all components.
+
+## CI/CD
+
+- Use GitHub Actions for CI/CD pipelines.
+- Use separate pipelines for application and infrastructure deployments.
+- Use Workload Identity Federation for secure deployments without secrets.
