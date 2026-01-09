@@ -29,6 +29,7 @@ reset/jump without accidentally “dirtying” a checkpoint.
 - `phase/00-init` = starting point before you run `specify init`
 - `phase/01-constitution` = starting point for generating the constitution
 - `phase/02-spec` = starting point for generating the first spec
+- `phase/03-plan` = starting point for generating the first plan
 
 ### Jump to a phase (fast)
 
@@ -128,3 +129,14 @@ This repo includes a reusable Copilot prompt for spec generation. In Copilot
 Chat, run:
 
 `/healthplanchat-specify`
+
+## Plan Phase (Phase 03)
+
+Goal: create the first implementation plan in `specs/<feature-branch>/plan.md`.
+
+### Generate the plan
+
+This repo includes a reusable Copilot prompt for plan generation. In Copilot
+Chat, run:
+
+`/healthplanchat-plan`
