@@ -146,6 +146,11 @@ Chat, run:
 Goal: turn the plan into actionable implementation tasks in
 `specs/<feature-branch>/tasks.md`.
 
+Note: Spec Kit scripts write to `specs/<feature-branch>/...` based on your
+current git branch name. If you are on `main` or a detached phase tag, switch to
+your feature branch (e.g., `001-health-plan-chat`) before running `/speckit.tasks`,
+or set `SPECIFY_FEATURE` to the feature folder name.
+
 ### Generate the tasks
 
 You can use Spec Kit’s built-in tasks agent directly (no repo-specific prompt is
