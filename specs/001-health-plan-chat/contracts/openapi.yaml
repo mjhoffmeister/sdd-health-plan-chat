@@ -1,0 +1,84 @@
+openapi: 3.0.3
+info:
+  title: Health Plan Chat API
+  version: 0.1.0
+servers:
+  - url: https://{host}
+    variables:
+      host:
+        default: localhost
+paths:
+  /healthz:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+  /api/sessions:
+    post:
+      summary: Start a new chat session
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSessionResponse'
+  /api/chat:
+    post:
+      summary: Send a chat message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+components:
+  schemas:
+    CreateSessionResponse:
+      type: object
+      required: [sessionId]
+      properties:
+        sessionId:
+          type: string
+          description: Server-issued session identifier
+    ChatRequest:
+      type: object
+      required: [sessionId, message]
+      properties:
+        sessionId:
+          type: string
+        message:
+          type: string
+          minLength: 1
+    ChatResponse:
+      type: object
+      required: [answerType, answerText, references]
+      properties:
+        answerType:
+          type: string
+          enum: [Grounded, GeneralGuidance]
+        answerText:
+          type: string
+        references:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reference'
+    Reference:
+      type: object
+      required: [planDocumentId, anchor, quote]
+      properties:
+        planDocumentId:
+          type: string
+        anchor:
+          type: string
+          description: Page, section, or chunk identifier
+        quote:
+          type: string
