@@ -9,8 +9,9 @@ Auto-generated from all feature plans. Last updated: 2026-01-09
 ## Project Structure
 
 ```text
-backend/
-frontend/
+src/
+	backend/
+	frontend/
 tests/
 ```
 

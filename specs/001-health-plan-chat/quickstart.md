@@ -12,10 +12,10 @@
 - Put JSON files under a repo folder (planned): `data/plan-materials/`
 
 2) Run backend
-- From repo root (once code exists): `dotnet run --project backend/...`
+- From repo root (once code exists): `dotnet run --project src/backend/...`
 
 3) Run frontend
-- From repo root (once code exists): `dotnet run --project frontend/...`
+- From repo root (once code exists): `dotnet run --project src/frontend/...`
 
 Local mode uses:
 - In-memory plan material loader

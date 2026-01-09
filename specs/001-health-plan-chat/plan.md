@@ -65,7 +65,8 @@ specs/[###-feature]/
 -->
 
 ```text
-backend/
+src/
+  backend/
   HealthPlanChat.sln
   HealthPlanChat.Core/
   HealthPlanChat.Infrastructure.{Provider}/
@@ -74,7 +75,7 @@ backend/
   HealthPlanChat.Core.UnitTests/
   HealthPlanChat.Infrastructure.IntegrationTests/
 
-frontend/
+  frontend/
   HealthPlanChat.Web/
 
 infra/
