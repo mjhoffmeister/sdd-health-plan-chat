@@ -11,7 +11,7 @@ phases.
 
 ## Demo Phases
 
-**init → constitution → spec → plan → implement**
+**init → constitution → spec → plan → tasks → implement**
 
 Each phase produces durable artifacts that constrain and guide the next phase.
 
@@ -140,3 +140,19 @@ This repo includes a reusable Copilot prompt for plan generation. In Copilot
 Chat, run:
 
 `/healthplanchat-plan`
+
+## Tasks Phase (Phase 04)
+
+Goal: turn the plan into actionable implementation tasks in
+`specs/<feature-branch>/tasks.md`.
+
+### Generate the tasks
+
+You can use Spec Kit’s built-in tasks agent directly (no repo-specific prompt is
+required):
+
+`/speckit.tasks`
+
+Optional: if you want to create GitHub issues from tasks, run:
+
+`/speckit.taskstoissues`
