@@ -41,6 +41,10 @@ include references back to the plan materials.
   user asks a question that spans them, **Then** the product provides a single
   grounded answer that reconciles the information and references the relevant
   sections.
+3. **Given** the user has an existing chat session with prior messages,
+  **When** the user asks a follow-up question that references earlier messages,
+  **Then** the product maintains the chat history within the session and the
+  assistant responds consistently with the session context.
 
 ---
 
@@ -94,6 +98,7 @@ chatting without losing context.
   in plan materials.
 - The user asks a multi-part question where only some parts are answerable from
   plan materials.
+- The user refreshes the page or navigates away mid-session.
 
 ## Requirements *(mandatory)*
 
@@ -118,9 +123,13 @@ chatting without losing context.
   plan-backed.
 - **FR-006**: The product MUST provide a clean, modern UI that supports both
   light and dark modes.
-- **FR-007**: The product MUST allow the user to start a new chat session that
+- **FR-007**: The product MUST maintain chat history within a session so users
+  can review earlier messages while continuing the conversation.
+- **FR-008**: The product MUST allow the user to start a new chat session that
   clears the visible conversation.
-- **FR-008**: The product MUST avoid exposing sensitive data in the UI (for
+- **FR-009**: The product MUST preserve the user-visible message history when
+  switching between light and dark mode.
+- **FR-010**: The product MUST avoid exposing sensitive data in the UI (for
   example: credentials or secrets).
 
 ### Key Entities *(include if feature involves data)*
@@ -154,3 +163,5 @@ chatting without losing context.
   UI remains readable.
 - **SC-004**: In a demo run, a user can ask a question and receive an initial
   response in under 5 seconds for at least 95% of questions.
+- **SC-005**: In a single session, the user can send at least 10 messages and
+  the full message history remains visible and usable throughout the session.
