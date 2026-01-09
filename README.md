@@ -30,6 +30,7 @@ reset/jump without accidentally “dirtying” a checkpoint.
 - `phase/01-constitution` = starting point for generating the constitution
 - `phase/02-spec` = starting point for generating the first spec
 - `phase/03-plan` = starting point for generating the first plan
+- `phase/04-tasks` = starting point for generating the first tasks
 
 ### Jump to a phase (fast)
 
@@ -123,6 +124,12 @@ Then review and refine the output in `.specify/memory/constitution.md`.
 Goal: create the first feature specification in
 `specs/<feature-branch>/spec.md`.
 
+Note: Spec Kit scripts write to `specs/<feature-branch>/...` based on your
+current git branch name. If you are on `main` or a detached phase tag, switch to
+your feature branch (e.g., `001-health-plan-chat`) before generating spec/plan/
+tasks artifacts. If you are not using git, set `SPECIFY_FEATURE` to the feature
+folder name.
+
 ### Generate the spec
 
 This repo includes a reusable Copilot prompt for spec generation. In Copilot
@@ -148,8 +155,8 @@ Goal: turn the plan into actionable implementation tasks in
 
 ### Generate the tasks
 
-You can use Spec Kit’s built-in tasks agent directly (no repo-specific prompt is
-required):
+Use Spec Kit’s built-in tasks agent (no additional repo-specific prompt is
+needed):
 
 `/speckit.tasks`
 
