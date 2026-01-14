@@ -3,7 +3,13 @@
 **Input**: Design documents from `/specs/001-health-plan-chat/`
 **Prerequisites**: plan.md (required), spec.md (required), research.md, data-model.md, contracts/
 
-**Tests**: Automated test tasks are **not included** (the spec does not explicitly require TDD). Add them later if you want a test-first workflow.
+**Tests**: Include automated tests where practical. Critical paths MUST be covered by automated tests (per constitution). Start with Core unit tests for deterministic logic, then add minimal API smoke/integration coverage.
+
+**Deployment policy**: All infrastructure and application deployments (including first deployments) MUST be performed via GitHub Actions. Local commands may be used for validation (e.g., `terraform validate`), but not for deployment.
+
+**Agent Framework policy**: Use Agent Framework via `Microsoft.Agents.AI` pinned to `1.0.0-preview.260108.1`.
+
+**NuGet version policy**: Pin all non-framework NuGet packages via Central Package Management. Use the versions listed in `specs/001-health-plan-chat/plan.md` (do not float versions).
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
@@ -18,7 +24,7 @@
 **Purpose**: Initialize repo structure and baseline projects.
 
 - [ ] T001 Create top-level folders `src/`, `infra/terraform/`, `data/plan-materials/`
-- [ ] T002 Scaffold backend solution in `src/backend/HealthPlanChat.sln` (Core/Infrastructure/Bootstrapper/WebApi + test projects)
+- [ ] T002 Scaffold backend solution in `src/backend/HealthPlanChat.sln` (Core/Infrastructure/Bootstrapper/WebApi + test projects) and enable Central Package Management in `src/backend/Directory.Packages.props` with pinned versions: `Microsoft.Agents.AI` `1.0.0-preview.260108.1`, `Azure.Search.Documents` `11.7.0`, `Azure.Storage.Blobs` `12.27.0`, `Azure.Identity` `1.17.1`, `Microsoft.Azure.StackExchangeRedis` `3.3.1`, `FluentResults` `4.0.0`, `xunit` `2.9.3`, `xunit.runner.visualstudio` `3.1.5`, `Microsoft.NET.Test.Sdk` `18.0.1`, `FluentAssertions` `8.8.0`, `Moq` `4.20.72`
 - [ ] T003 [P] Delete generated placeholders (e.g., `src/backend/**/Class1.cs`, `src/backend/**/UnitTest1.cs`)
 - [ ] T004 [P] Scaffold Blazor WebAssembly app in `src/frontend/HealthPlanChat.Web/`
 - [ ] T005 [P] Add local dev settings template in `src/backend/HealthPlanChat.WebApi/appsettings.Development.json` (no secrets)
@@ -33,16 +39,32 @@
 
 - [ ] T008 Create shared API contracts (DTOs) in `src/backend/HealthPlanChat.Core/UseCases/Contracts/`
 - [ ] T009 Create domain models in `src/backend/HealthPlanChat.Core/Domain/Chat/` (ChatSession, ChatMessage, AnswerType, Reference)
-- [ ] T010 Create external interfaces in `src/backend/HealthPlanChat.Core/ExternalInterfaces/` (IChatSessionStore, IPlanMaterialSearch, IChatCompletionClient)
-- [ ] T011 Create configuration options in `src/backend/HealthPlanChat.Core/ExternalInterfaces/Options/` (RedisOptions, SearchOptions, FoundryOptions)
+- [ ] T010 Create external interfaces in `src/backend/HealthPlanChat.Core/ExternalInterfaces/` (IChatSessionStore, IPlanMaterialSearch, IChatAgent)
+- [ ] T011 Define configuration binding in `src/backend/HealthPlanChat.WebApi/Configuration/` and keep provider-specific option types in their Infrastructure projects (e.g., `src/backend/HealthPlanChat.Infrastructure.Redis/RedisOptions.cs`, `src/backend/HealthPlanChat.Infrastructure.Search/SearchOptions.cs`, `src/backend/HealthPlanChat.Infrastructure.Foundry/FoundryOptions.cs`)
 - [ ] T012 Implement minimal API host skeleton in `src/backend/HealthPlanChat.WebApi/Program.cs` (healthz + routing)
-- [ ] T013 Implement structured logging + safe error handling middleware in `src/backend/HealthPlanChat.WebApi/Middleware/`
+- [ ] T013 Implement structured logging + safe error handling middleware in `src/backend/HealthPlanChat.WebApi/Middleware/` and create a lightweight threat model + abuse cases doc in `specs/001-health-plan-chat/security.md` (prompt injection, data exfiltration, logging/redaction, session id handling, Azure integration risks)
 - [ ] T014 Implement Bootstrapper DI registration in `src/backend/HealthPlanChat.Bootstrapper/ServiceCollectionExtensions.cs`
-- [ ] T015 [P] Implement in-memory session store for local dev in `src/backend/HealthPlanChat.Infrastructure.Local/InMemoryChatSessionStore.cs`
-- [ ] T016 [P] Implement in-memory plan material search for local dev in `src/backend/HealthPlanChat.Infrastructure.Local/InMemoryPlanMaterialSearch.cs`
-- [ ] T017 Add JSON plan-material loader (repo `data/plan-materials/`) in `src/backend/HealthPlanChat.Infrastructure.Local/PlanMaterialLoader.cs`
-- [ ] T018 Wire local-dev infrastructure into DI in `src/backend/HealthPlanChat.Bootstrapper/ServiceCollectionExtensions.cs`
-- [ ] T019 Add frontend HTTP client wiring in `src/frontend/HealthPlanChat.Web/Program.cs` and `src/frontend/HealthPlanChat.Web/Services/ApiClient.cs`
+
+- [ ] T015 [P] Add Terraform provider + backend skeleton in `infra/terraform/providers.tf` (use AzAPI provider pinned to `2.8.0` in `required_providers`)
+- [ ] T016 [P] Add Terraform remote state bootstrap script for a self-bootstrapping pipeline (Pattern 2) in `infra/terraform/state-bootstrap.ps1` (idempotently create RG + Storage Account + Container for Terraform state and assign `Storage Blob Data Contributor` to the GitHub Actions WIF identity; intended to run from GitHub Actions)
+- [ ] T017 Configure Terraform remote state backend in `infra/terraform/providers.tf` using `backend "azurerm" {}` and pass concrete backend settings via `-backend-config` from the workflow (single demo environment: one storage account/container/key; avoid hardcoding names in code)
+- [ ] T018 [P] Add Terraform resources for App Service + plan in `infra/terraform/appservice.tf`
+- [ ] T019 [P] Add Terraform resources for Static Web Apps in `infra/terraform/swa.tf`
+- [ ] T020 [P] Add Terraform resources for Azure AI Search + index in `infra/terraform/search.tf`
+- [ ] T021 [P] Add Terraform resources for Storage account + container in `infra/terraform/storage.tf`
+- [ ] T022 [P] Add Terraform resources for Azure Managed Redis (Redis Enterprise) in `infra/terraform/redis.tf` using AzAPI: `Microsoft.Cache/redisEnterprise@2025-04-01` AND the required child `Microsoft.Cache/redisEnterprise/databases@2025-04-01` (create `default` database)
+- [ ] T023 [P] Add Terraform resources for Azure AI Foundry / Azure AI Services account in `infra/terraform/foundry.tf`
+- [ ] T024 [P] Add Terraform model deployments for `gpt-5-mini` and `text-embedding-3-small` in `infra/terraform/foundry.deployments.tf`
+- [ ] T025 [P] Add GitHub Actions Workload Identity Federation (WIF/OIDC) setup in `infra/terraform/identity.tf`: create a new Entra application registration (no pre-existing app), ensure its service principal exists in the tenant, add federated identity credential(s) scoped to this repo, and output values needed by workflows (`AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_CLIENT_ID`)
+- [ ] T026 [P] Add Terraform role assignments co-located with the owning resources: App Service managed identity access in `infra/terraform/appservice.tf` (Search/Storage/Foundry/Redis as needed) and any service-specific roles in their respective files (`infra/terraform/search.tf`, `infra/terraform/storage.tf`, `infra/terraform/foundry.tf`, `infra/terraform/redis.tf`)
+- [ ] T027 Add GitHub Actions workflow for infra deploy (WIF/OIDC + `workflow_dispatch`) in `.github/workflows/infra.yml` implementing Pattern 2: `azure/login` (OIDC) → run `infra/terraform/state-bootstrap.ps1` → `terraform init` with `-backend-config` → `terraform plan/apply` (no client secrets)
+- [ ] T028 Add GitHub Actions workflow for app build/deploy (WIF/OIDC + `workflow_dispatch`) in `.github/workflows/app.yml` (use `azure/login` with `client-id/tenant-id/subscription-id`; deploy backend/frontend without secrets on runners)
+
+- [ ] T029 [P] Implement Azure Managed Redis-backed `IChatSessionStore` using `Microsoft.Azure.StackExchangeRedis` in `src/backend/HealthPlanChat.Infrastructure.Redis/RedisChatSessionStore.cs` (TTL, ordered messages, per-session keying)
+- [ ] T030 [P] Implement Azure AI Search adapter in `src/backend/HealthPlanChat.Infrastructure.Search/AzureAiSearchPlanMaterialSearch.cs`
+- [ ] T031 [P] Implement `IChatAgent` using Agent Framework targeting Azure AI Foundry (`Microsoft.Agents.AI` `1.0.0-preview.260108.1`) in `src/backend/HealthPlanChat.Infrastructure.Foundry/AgentFrameworkChatAgent.cs`
+- [ ] T032 Add plan-material upload/indexing helper in `src/backend/HealthPlanChat.Infrastructure.Storage/PlanMaterialBlobPublisher.cs` (upload JSON from `data/plan-materials/` to Blob; trigger indexing)
+- [ ] T033 Add frontend HTTP client wiring in `src/frontend/HealthPlanChat.Web/Program.cs` and `src/frontend/HealthPlanChat.Web/Services/ApiClient.cs`
 
 **Checkpoint**: Foundation ready — user story work can begin.
 
@@ -56,21 +78,21 @@
 
 ### Implementation (US1)
 
-- [ ] T020 [US1] Define use case contracts in `src/backend/HealthPlanChat.Core/UseCases/SendChatMessage/` (Request/Response/Boundary/Interactor)
-- [ ] T021 [US1] Define use case contracts in `src/backend/HealthPlanChat.Core/UseCases/CreateSession/` (Request/Response/Boundary/Interactor)
-- [ ] T022 [US1] Implement `CreateSessionInteractor` in `src/backend/HealthPlanChat.Core/UseCases/CreateSession/CreateSessionInteractor.cs`
-- [ ] T023 [US1] Implement `SendChatMessageInteractor` in `src/backend/HealthPlanChat.Core/UseCases/SendChatMessage/SendChatMessageInteractor.cs`
-- [ ] T024 [P] [US1] Add presenter for session creation in `src/backend/HealthPlanChat.WebApi/Presenters/CreateSessionPresenter.cs`
-- [ ] T025 [P] [US1] Add presenter for chat responses in `src/backend/HealthPlanChat.WebApi/Presenters/SendChatMessagePresenter.cs`
-- [ ] T026 [US1] Map endpoints per OpenAPI in `src/backend/HealthPlanChat.WebApi/Endpoints/ChatEndpoints.cs` (`POST /api/sessions`, `POST /api/chat`)
-- [ ] T027 [US1] Implement prompt construction (grounded answers + citations) in `src/backend/HealthPlanChat.Infrastructure.Prompting/PromptBuilder.cs`
-- [ ] T028 [P] [US1] Implement Azure AI Foundry chat client wrapper in `src/backend/HealthPlanChat.Infrastructure.Foundry/FoundryChatCompletionClient.cs`
-- [ ] T029 [P] [US1] Implement Azure AI Search query adapter in `src/backend/HealthPlanChat.Infrastructure.Search/AzureAiSearchPlanMaterialSearch.cs`
-- [ ] T030 [P] [US1] Implement Azure Blob plan-material ingestion (upload + indexing trigger) in `src/backend/HealthPlanChat.Infrastructure.Storage/PlanMaterialBlobPublisher.cs`
-- [ ] T031 [US1] Wire Azure implementations behind interfaces in `src/backend/HealthPlanChat.Bootstrapper/ServiceCollectionExtensions.cs`
-- [ ] T032 [US1] Implement minimal chat UI page in `src/frontend/HealthPlanChat.Web/Pages/Chat.razor`
-- [ ] T033 [US1] Implement chat state + session initialization in `src/frontend/HealthPlanChat.Web/Services/ChatSessionService.cs`
-- [ ] T034 [US1] Render grounded references in UI in `src/frontend/HealthPlanChat.Web/Components/ReferencesList.razor`
+- [ ] T034 [US1] Define the single Chat use case contracts in `src/backend/HealthPlanChat.Core/UseCases/Chat/` (Request/Response/Boundary/Interactor)
+- [ ] T035 [US1] Extend `IChatSessionStore` contract in `src/backend/HealthPlanChat.Core/ExternalInterfaces/IChatSessionStore.cs` to support session creation + message history retrieval/append (so `/api/sessions` can be a thin endpoint)
+- [ ] T036 [US1] Implement `ChatInteractor` in `src/backend/HealthPlanChat.Core/UseCases/Chat/ChatInteractor.cs` (loads session history, retrieves materials, invokes `IChatAgent`, appends assistant message)
+- [ ] T037 [US1] Ensure `ChatInteractor` always returns explicit `answerType` + `references` (no separate chained use cases)
+- [ ] T038 [P] [US1] Add presenter for session creation in `src/backend/HealthPlanChat.WebApi/Presenters/CreateSessionPresenter.cs` (thin wrapper over `IChatSessionStore.CreateSession`)
+- [ ] T039 [P] [US1] Add presenter for chat responses in `src/backend/HealthPlanChat.WebApi/Presenters/ChatPresenter.cs`
+- [ ] T040 [US1] Map endpoints per OpenAPI in `src/backend/HealthPlanChat.WebApi/Endpoints/ChatEndpoints.cs` (`POST /api/sessions` uses session store directly, `POST /api/chat` calls `ChatInteractor`)
+- [ ] T041 [US1] Implement prompt construction (grounded answers + citations) in `src/backend/HealthPlanChat.Infrastructure.Prompting/PromptBuilder.cs`
+- [ ] T042 [US1] Wire Azure implementations behind interfaces in `src/backend/HealthPlanChat.Bootstrapper/ServiceCollectionExtensions.cs`
+- [ ] T043 [US1] Add minimal runtime configuration + health checks in `src/backend/HealthPlanChat.WebApi/Program.cs` (validate required Azure settings on startup; include `/healthz`)
+- [ ] T044 [P] [US1] Add safe request/response logging filters in `src/backend/HealthPlanChat.WebApi/Middleware/` to avoid logging prompt/user content
+- [ ] T045 [US1] Add a “seed plan materials” workflow step or tool invocation in `.github/workflows/app.yml` (upload `data/plan-materials/` to Blob; trigger indexing)
+- [ ] T046 [P] [US1] Implement minimal chat UI page in `src/frontend/HealthPlanChat.Web/Pages/Chat.razor`
+- [ ] T047 [P] [US1] Implement chat state + session initialization in `src/frontend/HealthPlanChat.Web/Services/ChatSessionService.cs`
+- [ ] T048 [P] [US1] Render grounded references in UI in `src/frontend/HealthPlanChat.Web/Components/ReferencesList.razor`
 
 **Checkpoint**: US1 works via API (and minimal UI) with grounded answers + references.
 
@@ -84,12 +106,12 @@
 
 ### Implementation (US2)
 
-- [ ] T035 [US2] Add retrieval confidence/threshold policy in `src/backend/HealthPlanChat.Core/Domain/Retrieval/RetrievalPolicy.cs`
-- [ ] T036 [US2] Update `SendChatMessageInteractor` fallback path in `src/backend/HealthPlanChat.Core/UseCases/SendChatMessage/SendChatMessageInteractor.cs`
-- [ ] T037 [US2] Update prompting to force explicit labeling for all responses in `src/backend/HealthPlanChat.Infrastructure.Prompting/PromptBuilder.cs`
-- [ ] T038 [US2] Ensure API response always returns `answerType` and `references` in `src/backend/HealthPlanChat.WebApi/Presenters/SendChatMessagePresenter.cs`
-- [ ] T039 [US2] Update UI to show answer type badge in `src/frontend/HealthPlanChat.Web/Components/AnswerTypeBadge.razor`
-- [ ] T040 [US2] Add UX copy for “general guidance” disclaimer in `src/frontend/HealthPlanChat.Web/Components/AnswerDisclaimer.razor`
+- [ ] T049 [P] [US2] Add retrieval confidence/threshold policy in `src/backend/HealthPlanChat.Core/Domain/Retrieval/RetrievalPolicy.cs` (define confidence as: has at least `MinHits` AND top AI Search score >= `MinTopScore`; defaults + config keys documented, e.g., `Retrieval__MinHits`, `Retrieval__MinTopScore`)
+- [ ] T050 [US2] Update `ChatInteractor` to apply `RetrievalPolicy` and produce `answerType=GeneralGuidance` when retrieval confidence is below threshold in `src/backend/HealthPlanChat.Core/UseCases/Chat/ChatInteractor.cs`
+- [ ] T051 [US2] Update prompting to force explicit labeling for all responses in `src/backend/HealthPlanChat.Infrastructure.Prompting/PromptBuilder.cs`
+- [ ] T052 [US2] Ensure API response always returns `answerType` and `references` in `src/backend/HealthPlanChat.WebApi/Presenters/ChatPresenter.cs`
+- [ ] T053 [P] [US2] Update UI to show answer type badge in `src/frontend/HealthPlanChat.Web/Components/AnswerTypeBadge.razor`
+- [ ] T054 [P] [US2] Add UX copy for “general guidance” disclaimer in `src/frontend/HealthPlanChat.Web/Components/AnswerDisclaimer.razor`
 
 **Checkpoint**: US2 behavior is reliable and non-misleading.
 
@@ -103,11 +125,11 @@
 
 ### Implementation (US3)
 
-- [ ] T041 [US3] Add theme state service with persistence in `src/frontend/HealthPlanChat.Web/Services/ThemeService.cs`
-- [ ] T042 [US3] Add theme toggle UI in `src/frontend/HealthPlanChat.Web/Components/ThemeToggle.razor`
-- [ ] T043 [US3] Implement CSS variables/themes in `src/frontend/HealthPlanChat.Web/wwwroot/css/app.css`
-- [ ] T044 [US3] Ensure chat history remains intact across theme changes in `src/frontend/HealthPlanChat.Web/Pages/Chat.razor`
-- [ ] T045 [US3] Add “New chat” button that clears visible conversation in `src/frontend/HealthPlanChat.Web/Components/NewChatButton.razor`
+- [ ] T055 [P] [US3] Add theme state service with persistence in `src/frontend/HealthPlanChat.Web/Services/ThemeService.cs`
+- [ ] T056 [P] [US3] Add theme toggle UI in `src/frontend/HealthPlanChat.Web/Components/ThemeToggle.razor`
+- [ ] T057 [P] [US3] Implement CSS variables/themes in `src/frontend/HealthPlanChat.Web/wwwroot/css/app.css`
+- [ ] T058 [US3] Ensure chat history remains intact across theme changes in `src/frontend/HealthPlanChat.Web/Pages/Chat.razor`
+- [ ] T059 [US3] Add “New chat” button that clears visible conversation in `src/frontend/HealthPlanChat.Web/Components/NewChatButton.razor`
 
 **Checkpoint**: US3 demo-ready UI with theme switching.
 
@@ -117,16 +139,13 @@
 
 **Purpose**: Infrastructure, deployment, and demo hardening.
 
-- [ ] T046 [P] Add Terraform provider + backend skeleton in `infra/terraform/providers.tf`
-- [ ] T047 [P] Add Terraform resources for App Service + plan in `infra/terraform/appservice.tf`
-- [ ] T048 [P] Add Terraform resources for Static Web Apps in `infra/terraform/swa.tf`
-- [ ] T049 [P] Add Terraform resources for Azure AI Search + index in `infra/terraform/search.tf`
-- [ ] T050 [P] Add Terraform resources for Storage account + container in `infra/terraform/storage.tf`
-- [ ] T051 [P] Add Terraform resources for Azure Managed Redis in `infra/terraform/redis.tf`
-- [ ] T052 Add GitHub Actions workflow for infra deploy (WIF) in `.github/workflows/infra.yml`
-- [ ] T053 Add GitHub Actions workflow for app build/deploy in `.github/workflows/app.yml`
-- [ ] T054 Add runtime configuration docs in `specs/001-health-plan-chat/quickstart.md` (Azure env vars and expected settings)
-- [ ] T055 Validate Quickstart end-to-end and update `specs/001-health-plan-chat/quickstart.md` with final commands
+- [ ] T060 Add runtime configuration docs in `specs/001-health-plan-chat/quickstart.md` (Azure env vars and expected settings)
+- [ ] T061 Validate Quickstart end-to-end and update `specs/001-health-plan-chat/quickstart.md` with final commands (include a short demo checklist using `data/demo-questions.json` for SC-001 spot-checks)
+- [ ] T062 Add Core unit tests for `ChatInteractor` (labeling: Grounded vs GeneralGuidance; references shape; deterministic behavior) in `src/backend/HealthPlanChat.Core.UnitTests/UseCases/Chat/ChatInteractorTests.cs`
+- [ ] T063 Add unit tests for `PromptBuilder` (citations formatting; “no hallucinated citations” rules; consistent labeling) in `src/backend/HealthPlanChat.Infrastructure.Prompting.UnitTests/PromptBuilderTests.cs`
+- [ ] T064 Add minimal API smoke/integration tests for `POST /api/sessions` and `POST /api/chat` using DI test doubles for external services (no network/cloud dependencies) in `src/backend/HealthPlanChat.Infrastructure.IntegrationTests/ChatEndpointsTests.cs`
+- [ ] T065 Wire config binding in `src/backend/HealthPlanChat.Bootstrapper/ServiceCollectionExtensions.cs` (managed identity by default; if any secrets are unavoidable, store them as GitHub Actions environment secrets and inject via app settings at deploy time)
+- [ ] T066 Add request timing + structured logging for `/api/chat` (record duration + answerType; avoid logging prompt/user content) in `src/backend/HealthPlanChat.WebApi/Middleware/RequestTimingMiddleware.cs`
 
 ---
 
@@ -137,7 +156,7 @@
 - **Setup (Phase 1)**: No dependencies
 - **Foundational (Phase 2)**: Depends on Setup; blocks all user stories
 - **User Stories (Phase 3+)**: Depend on Foundational
-- **Polish (Phase 6)**: Depends on whichever stories you intend to deploy
+- **Polish (Phase 6)**: Depends on at least US1 (and is typically done after the app is runnable)
 
 ### User Story Dependencies
 
@@ -145,12 +164,16 @@
 - **US2 (P2)**: Starts after Foundational; builds on the same `/api/chat` flow
 - **US3 (P3)**: Starts after Foundational; primarily frontend
 
+### Suggested Completion Graph
+
+- Setup (Phase 1) → Foundational (Phase 2) → US1 (Phase 3) → US2 (Phase 4) → US3 (Phase 5) → Polish (Phase 6)
+
 ### Parallel Opportunities
 
 - Setup tasks marked [P] can run in parallel
-- Foundational local adapters (T015, T016) can run in parallel
-- Azure infrastructure adapters (T028–T030) can be parallelized by provider
-- Terraform resource files (T046–T051) can be parallelized
+- Foundational Azure adapters (T029–T032) can run in parallel
+- US1 frontend tasks (T046–T048) can run in parallel with backend presenters/prompting (T038–T041)
+- Terraform/IaC tasks (T015–T026) can be parallelized
 
 ---
 
@@ -158,15 +181,21 @@
 
 ### User Story 1
 
-- T028 [P] [US1] `src/backend/HealthPlanChat.Infrastructure.Foundry/FoundryChatCompletionClient.cs`
-- T029 [P] [US1] `src/backend/HealthPlanChat.Infrastructure.Search/AzureAiSearchPlanMaterialSearch.cs`
-- T030 [P] [US1] `src/backend/HealthPlanChat.Infrastructure.Storage/PlanMaterialBlobPublisher.cs`
+- T038 [P] [US1] `src/backend/HealthPlanChat.WebApi/Presenters/CreateSessionPresenter.cs`
+- T039 [P] [US1] `src/backend/HealthPlanChat.WebApi/Presenters/ChatPresenter.cs`
+- T046 [P] [US1] `src/frontend/HealthPlanChat.Web/Pages/Chat.razor`
+
+### User Story 2
+
+- T049 [P] [US2] `src/backend/HealthPlanChat.Core/Domain/Retrieval/RetrievalPolicy.cs`
+- T053 [P] [US2] `src/frontend/HealthPlanChat.Web/Components/AnswerTypeBadge.razor`
+- T054 [P] [US2] `src/frontend/HealthPlanChat.Web/Components/AnswerDisclaimer.razor`
 
 ### User Story 3
 
-- T041 [US3] `src/frontend/HealthPlanChat.Web/Services/ThemeService.cs`
-- T043 [US3] `src/frontend/HealthPlanChat.Web/wwwroot/css/app.css`
-- T042 [US3] `src/frontend/HealthPlanChat.Web/Components/ThemeToggle.razor`
+- T055 [P] [US3] `src/frontend/HealthPlanChat.Web/Services/ThemeService.cs`
+- T057 [P] [US3] `src/frontend/HealthPlanChat.Web/wwwroot/css/app.css`
+- T056 [P] [US3] `src/frontend/HealthPlanChat.Web/Components/ThemeToggle.razor`
 
 ---
 
@@ -189,3 +218,5 @@
 - [P] tasks should be implemented in different files to avoid conflicts.
 - Keep privileged operations server-side; keep the client anonymous.
 - Always return explicit `answerType` and avoid leaking sensitive data in logs.
+
+- `src/backend/HealthPlanChat.Infrastructure.Prompting.UnitTests/` may need to be added as a new test project if it doesn’t exist yet.

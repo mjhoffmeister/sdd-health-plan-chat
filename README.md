@@ -152,7 +152,6 @@ Chat, run:
 
 Goal: turn the plan into actionable implementation tasks in
 `specs/<feature-branch>/tasks.md`.
-
 Note: If you are on `main` or a detached phase tag (including `phase/04-tasks`),
 switch to your feature branch (e.g., `001-health-plan-chat`) before running
 `/speckit.tasks`, or set `SPECIFY_FEATURE` to the feature folder name. The

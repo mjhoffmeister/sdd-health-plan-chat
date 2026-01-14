@@ -87,7 +87,6 @@ chatting without losing context.
 
 ---
 
-[Add more user stories as needed, each with an assigned priority]
 
 ### Edge Cases
 
@@ -98,14 +97,8 @@ chatting without losing context.
   in plan materials.
 - The user asks a multi-part question where only some parts are answerable from
   plan materials.
-- The user refreshes the page or navigates away mid-session.
 
 ## Requirements *(mandatory)*
-
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right functional requirements.
--->
 
 ### Functional Requirements
 
@@ -131,6 +124,7 @@ chatting without losing context.
   switching between light and dark mode.
 - **FR-010**: The product MUST avoid exposing sensitive data in the UI (for
   example: credentials or secrets).
+- **FR-011**: The product MUST perform infrastructure and application deployments (including first deployments) via GitHub Actions only.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -147,15 +141,11 @@ chatting without losing context.
 
 ## Success Criteria *(mandatory)*
 
-<!--
-  ACTION REQUIRED: Define measurable success criteria.
-  These must be technology-agnostic and measurable.
--->
-
 ### Measurable Outcomes
 
-- **SC-001**: For a standard set of demo questions that are answered in plan
-  materials, users receive a grounded answer with references for at least 90% of
+- **SC-001**: For the standard demo question set in `data/demo-questions.json`,
+  considering only questions marked `expectedAnswerType=Grounded`, users
+  receive a grounded answer with references for at least 90% of those
   questions.
 - **SC-002**: 100% of assistant responses are clearly labeled as either grounded
   in plan materials or general guidance.

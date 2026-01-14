@@ -14,7 +14,7 @@ This document resolves technical unknowns and records key implementation decisio
 - Decision: Index synthetic plan JSON into Azure AI Search and retrieve top chunks for grounding.
 - Rationale: Deterministic retrieval surface; good demos; clear citations.
 - Alternatives considered:
-  - Local in-memory search: simpler, but diverges from the Azure-focused tech decisions.
+  - Local in-memory search: acceptable for unit tests via DI test doubles, but not supported as a runtime mode (Azure-first).
 
 ### 3) Embeddings + chat models: Azure AI Foundry
 - Decision: Use `text-embedding-3-small` (global) for embeddings and `gpt-5-mini` (global) for chat completions.
@@ -22,11 +22,12 @@ This document resolves technical unknowns and records key implementation decisio
 - Alternatives considered:
   - Larger models: higher cost and latency without demo value.
 
-### 4) Chat history persistence: Azure Managed Redis (session scoped)
-- Decision: Store chat history in Azure Managed Redis with a TTL per session.
+### 4) Chat history persistence: Azure Managed Redis (Redis Enterprise) (session scoped)
+- Decision: Store chat history in Azure Managed Redis (Redis Enterprise) with a TTL per session.
+- IaC detail: provision via Terraform AzAPI using `Microsoft.Cache/redisEnterprise@2025-04-01` and the required `Microsoft.Cache/redisEnterprise/databases@2025-04-01` child resource (create `default`).
 - Rationale: Enables server-side session continuity while keeping the client anonymous; avoids database overhead.
 - Alternatives considered:
-  - In-memory cache: simplest but not durable across restarts.
+  - In-memory cache: simplest, but not durable across restarts; acceptable only as a test double.
   - Database: adds complexity for demo.
 
 ### 5) Identity: Managed Identity (runtime) + Workload Identity Federation (CI/CD)
@@ -47,4 +48,4 @@ This document resolves technical unknowns and records key implementation decisio
   - Decision: Source-of-truth is repo JSON (for reproducibility). In Azure, copy to Blob Storage for indexing.
 
 - Q: How is session maintained with anonymous users?
-  - Decision: Backend issues a session id (cookie or returned token); Redis key = session id; TTL expires sessions.
+  - Decision: Backend issues a session id returned by `POST /api/sessions`; client sends `sessionId` in `POST /api/chat`; Redis key = session id; TTL expires sessions.
