@@ -167,3 +167,28 @@ needed):
 Optional: if you want to create GitHub issues from tasks, run:
 
 `/speckit.taskstoissues`
+
+## Implement Phase (Phase 05)
+
+Goal: implement the feature by executing tasks in `specs/<feature-branch>/tasks.md`.
+
+### Pre-flight
+
+- Ensure you are on your feature branch (e.g., `001-health-plan-chat`) so Spec Kit writes to the right `specs/<feature-branch>/...` folder, or set `SPECIFY_FEATURE` to the feature folder name.
+- Confirm you have a generated tasks file at `specs/<feature-branch>/tasks.md`.
+
+Optional quality gate (recommended before writing code):
+
+`/speckit.analyze`
+
+If it reports CRITICAL issues, resolve those before continuing.
+
+### Implement tasks
+
+Use Spec Kit’s built-in implement agent:
+
+`/speckit.implement`
+
+In your prompt, specify which task IDs to implement (for example: “Implement T002–T006”). For smoother progress, implement in small batches and keep the working tree green (build/tests passing) between batches.
+
+Tip: tasks marked with `[P]` are intended to be parallelizable; for a solo demo, you can still implement them serially.
