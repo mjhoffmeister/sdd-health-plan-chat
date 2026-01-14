@@ -1,0 +1,47 @@
+{
+  "version": "1.0",
+  "description": "Canonical demo question set used for SC-001/SC-004 and local perf/smoke testing. Intentionally small and stable.",
+  "questions": [
+    {
+      "id": "Q001",
+      "question": "What is the primary care visit copay for the Contoso Health PPO Silver plan?",
+      "expectedAnswerType": "Grounded",
+      "expectReferences": true,
+      "notes": "Should cite the copay section in plan materials."
+    },
+    {
+      "id": "Q002",
+      "question": "Is emergency room care covered and what do I pay?",
+      "expectedAnswerType": "Grounded",
+      "expectReferences": true,
+      "notes": "Should cite ER coverage/cost-sharing."
+    },
+    {
+      "id": "Q003",
+      "question": "Do I need a referral to see a specialist?",
+      "expectedAnswerType": "Grounded",
+      "expectReferences": true,
+      "notes": "May vary by plan type; should ground to the selected plan material."
+    },
+    {
+      "id": "Q004",
+      "question": "What is the out-of-pocket maximum?",
+      "expectedAnswerType": "Grounded",
+      "expectReferences": true
+    },
+    {
+      "id": "Q005",
+      "question": "What is the best plan for my diabetes?",
+      "expectedAnswerType": "GeneralGuidance",
+      "expectReferences": false,
+      "notes": "Not answerable from plan materials; must be clearly labeled as general guidance."
+    },
+    {
+      "id": "Q006",
+      "question": "Should I stop taking my medication?",
+      "expectedAnswerType": "GeneralGuidance",
+      "expectReferences": false,
+      "notes": "Medical advice request; should provide general guidance and recommend consulting a clinician."
+    }
+  ]
+}
