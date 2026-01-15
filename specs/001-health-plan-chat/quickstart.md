@@ -27,28 +27,71 @@ Notes:
 
 **Policy**: Infrastructure and application deployments (including the first provisioning/deployment) are performed via GitHub Actions only.
 
-Provision:
-- Terraform (AzAPI provider, pinned to `2.8.0`) creates:
-  - Azure App Service (backend)
-  - Azure Static Web Apps (frontend)
-  - Azure AI Foundry resources/deployments
-  - Azure AI Search + index
-  - Azure Blob Storage (plan materials)
-  - Azure Managed Redis (Redis Enterprise cluster + `default` database) (session history)
+### One-time bootstrap (first deployment only)
 
-Deploy:
-- GitHub Actions pipelines
-  - `infra` pipeline: applies Terraform
-  - `app` pipeline: builds and deploys API + frontend
+The first deployment requires manual steps because WIF credentials are created by Terraform.
 
-Notes:
-- Use `workflow_dispatch` to run the `infra` pipeline for first-time provisioning.
-- Avoid manual `terraform apply` from a developer machine.
-- The `infra` pipeline bootstraps Terraform remote state (RG/Storage/Container + RBAC for the GitHub Actions WIF identity) before running `terraform init/plan/apply`.
+**Step 1: Azure login**
+
+```powershell
+az login
+az account set --subscription "Your-Subscription-Name"
+```
+
+Ensure your account has Contributor + User Access Administrator at subscription scope.
+
+**Step 2: Run infra workflow**
+
+In GitHub, trigger the `infra.yml` workflow with:
+- Environment: `demo`
+- Action: `apply`
+
+The workflow uses your Azure CLI auth context for the first run.
+
+**Step 3: Create GitHub Environment**
+
+After Terraform completes, run the bootstrap script locally:
+
+```powershell
+# Requires GitHub CLI (gh) and a PAT with admin:repo scope
+$env:GH_TOKEN = "ghp_your_pat_here"
+./scripts/setup-github-env.ps1 -Environment demo
+```
+
+This creates the `demo` environment and populates all required variables from Terraform outputs.
+
+**Step 4: Verify**
+
+Check GitHub repo Settings → Environments → `demo`. You should see:
+- `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`
+- `AZURE_APP_SERVICE_NAME`, `AZURE_STORAGE_ACCOUNT_NAME`
+- `AZURE_SWA_NAME`, `AZURE_SWA_HOSTNAME`, `AZURE_RESOURCE_GROUP_NAME`
+
+### Subsequent deployments
+
+After bootstrap, all deployments use WIF credentials automatically:
+- `infra.yml` — Terraform plan/apply/destroy
+- `app.yml` — Build, test, and deploy application
+
+### What gets provisioned
+
+Terraform (AzAPI provider, pinned to `2.8.0`) creates:
+- Azure App Service (backend)
+- Azure Static Web Apps (frontend)
+- Azure AI Foundry resources/deployments
+- Azure AI Search + index + indexer pipeline
+- Azure Blob Storage (plan materials)
+- Azure Managed Redis (Redis Enterprise cluster + `default` database)
+
+### What gets deployed
+
+GitHub Actions pipelines:
+- `infra.yml` — applies Terraform
+- `app.yml` — builds backend/frontend, deploys to App Service and SWA, syncs plan materials to Blob
 
 Run:
-- Upload plan JSON documents to Blob
-- Trigger indexing (indexer or app-startup ingest)
+- Plan materials are synced to Blob automatically by `app.yml`
+- Search indexer auto-triggers on blob changes
 - Open the Static Web App URL and start chatting
 
 ## Demo checklist

@@ -1,0 +1,108 @@
+name: Infrastructure Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'demo'
+        type: choice
+        options:
+          - demo
+      action:
+        description: 'Terraform action to perform'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_VAR_github_repository: ${{ github.repository }}
+  TF_VAR_github_environment: ${{ inputs.environment }}
+  ARM_USE_OIDC: true
+  ARM_USE_AZUREAD: true
+  # State storage settings
+  STATE_RESOURCE_GROUP: rg-healthplanchat-tfstate
+  STATE_STORAGE_ACCOUNT: sthealthplanchattfstate
+  STATE_CONTAINER: tfstate
+  STATE_KEY: healthplanchat.tfstate
+
+jobs:
+  terraform:
+    name: Terraform ${{ inputs.action }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Set ARM environment variables
+        run: |
+          echo "ARM_CLIENT_ID=${{ vars.AZURE_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=${{ vars.AZURE_TENANT_ID }}" >> $GITHUB_ENV
+          echo "ARM_SUBSCRIPTION_ID=${{ vars.AZURE_SUBSCRIPTION_ID }}" >> $GITHUB_ENV
+
+      - name: Bootstrap Terraform State Storage
+        shell: pwsh
+        run: |
+          ./infra/terraform/state-bootstrap.ps1 `
+            -ResourceGroupName "${{ env.STATE_RESOURCE_GROUP }}" `
+            -StorageAccountName "${{ env.STATE_STORAGE_ACCOUNT }}" `
+            -ContainerName "${{ env.STATE_CONTAINER }}" `
+            -Location "eastus2"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+
+      - name: Terraform Init
+        working-directory: infra/terraform
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=${{ env.STATE_RESOURCE_GROUP }}" \
+            -backend-config="storage_account_name=${{ env.STATE_STORAGE_ACCOUNT }}" \
+            -backend-config="container_name=${{ env.STATE_CONTAINER }}" \
+            -backend-config="key=${{ env.STATE_KEY }}"
+
+      - name: Terraform Validate
+        working-directory: infra/terraform
+        run: terraform validate
+
+      - name: Terraform Plan
+        working-directory: infra/terraform
+        run: terraform plan -out=tfplan -input=false
+
+      - name: Terraform Apply
+        if: inputs.action == 'apply'
+        working-directory: infra/terraform
+        run: terraform apply -auto-approve tfplan
+
+      - name: Terraform Destroy
+        if: inputs.action == 'destroy'
+        working-directory: infra/terraform
+        run: terraform destroy -auto-approve
+
+      - name: Output Terraform Values
+        if: inputs.action == 'apply'
+        working-directory: infra/terraform
+        run: |
+          echo "## Terraform Outputs" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          terraform output -json | jq -r 'to_entries | .[] | "- **\(.key)**: \(.value.value)"' >> $GITHUB_STEP_SUMMARY

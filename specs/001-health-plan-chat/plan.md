@@ -116,6 +116,32 @@ Key outcomes:
 - Confirmed Azure AI Foundry models: `text-embedding-3-small` + `gpt-5-mini`.
 - Confirmed session history stored in Azure Managed Redis (Redis Enterprise) with TTL.
 
+## Indexing Strategy
+
+**Approach**: Pull-based indexing via Azure AI Search indexer + skillset (Azure-native).
+
+**Rationale**: Search indexer automatically triggers when blobs are added/modified/deleted:
+- Zero application code for indexing
+- Azure-managed parsing, chunking, and embedding via skillset
+- Declarative Terraform resources
+- Built-in change detection and incremental indexing
+
+**Components** (all provisioned via Terraform in `infra/terraform/search.tf`):
+1. **Data Source**: Connects Search to Blob container (`plan-materials`)
+2. **Skillset**: `AzureOpenAIEmbedding` skill → calls `text-embedding-3-small` via AI Foundry
+3. **Indexer**: Orchestrates blob → skillset → index; runs on blob change or schedule
+
+**Flow**:
+1. CI/CD syncs plan JSON files to Blob Storage (using `az storage blob sync`; only changed files are uploaded)
+2. Search indexer detects new/changed blobs (automatic trigger via blob change detection)
+3. Skillset parses JSON, extracts sections, generates embeddings
+4. Documents are indexed with vectors into `plan-materials` index
+5. App queries the pre-populated index at runtime (no blob access needed)
+
+**RBAC for Indexing** (Search Service managed identity):
+- Storage Blob Data Reader → read plan material blobs
+- Cognitive Services User → call embedding API via skillset
+
 ## Phase 1: Design & Contracts
 
 Outputs:
@@ -130,7 +156,37 @@ Design highlights:
 - References: return a stable set of citations (document id + anchor + short quote).
 - Security: managed identity for service-to-service; no secrets committed; log redaction.
 
+### App Service Role Assignments (Managed Identity)
+
+Least-privilege roles for runtime operations only:
+
+| Target Service | Role | Role Definition ID | Justification |
+|----------------|------|-------------------|---------------|
+| Azure AI Search | Search Index Data Reader | `1407120a-92aa-4202-b7e9-c0e197c71c8f` | Query plan-materials index |
+| Azure AI Foundry | Cognitive Services User | `a97b65f3-24c7-4388-baec-2e87135dc908` | Invoke gpt-5-mini and embeddings |
+| Azure Managed Redis | *(access key via app settings)* | — | Session store read/write |
+| Blob Storage | **None** | — | Content accessed via Search index; blobs seeded by CI/CD workflow (WIF identity) |
+
 Re-check Constitution: PASS (security, simplicity, and testability preserved; external dependencies isolated behind interfaces).
+
+## CI/CD Bootstrap Process
+
+**First-time deployment requires a one-time bootstrap** because WIF credentials are created by Terraform but the first Terraform run needs Azure auth.
+
+**Bootstrap steps:**
+1. Operator runs `az login` locally with sufficient permissions (Contributor + User Access Administrator at subscription scope)
+2. Operator triggers `infra.yml` workflow with action `apply` (first run uses Azure CLI auth context)
+3. After Terraform apply completes, operator runs `scripts/setup-github-env.ps1` to create GitHub Environment and populate variables from Terraform outputs
+4. Subsequent workflow runs use WIF credentials automatically
+
+**GitHub Environment variables** (set by bootstrap script from Terraform outputs):
+- `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` — WIF identity
+- `AZURE_APP_SERVICE_NAME`, `AZURE_STORAGE_ACCOUNT_NAME` — resource names for deployment
+- `AZURE_SWA_NAME`, `AZURE_SWA_HOSTNAME`, `AZURE_RESOURCE_GROUP_NAME` — SWA deployment
+
+**No secrets required**: SWA deployment uses `az staticwebapp deploy` (CLI-based, WIF-compatible) instead of a deployment token.
+
+**PAT requirement**: The bootstrap script requires a GitHub PAT with `admin:repo` scope to create environments and set variables (GITHUB_TOKEN from Actions doesn't have these permissions). The PAT is used locally by the operator and never stored in workflows.
 
 ## Phase 2: Implementation Plan (Outline)
 
