@@ -8,9 +8,14 @@ refreshing prompts, moving tags). It is intentionally not part of the normal
 
 Phase tags mark the *start* of a phase.
 
-- `phase/00-init` is the start of init.
-- `phase/01-constitution` is the start of constitution (init complete).
-- Future phases follow the same convention.
+Current phase tags on `origin`:
+
+- `phase/00-init` = start of init
+- `phase/01-constitution` = start of constitution (init complete)
+- `phase/02-spec` = start of spec
+- `phase/03-plan` = start of plan
+- `phase/04-tasks` = start of tasks
+- `phase/05-implement/01-setup` = start of implement (Phase 1: Setup)
 
 ### Hierarchical tags ("folders")
 
@@ -20,9 +25,14 @@ Important constraint: you cannot have both `phase/05-implement` and `phase/05-im
 
 ### Implement phase checkpoints
 
-To keep semantics consistent with earlier phases (start-of-phase checkpoints), the implement phase uses hierarchical tags:
+To keep semantics consistent with earlier phases (start-of-phase checkpoints), the implement phase uses hierarchical tags.
+
+Existing implement tag(s):
 
 - `phase/05-implement/01-setup` = start of implementation Phase 1 (Setup)
+
+Planned next tags (created as implementation progresses):
+
 - `phase/05-implement/02-foundational` = start of implementation Phase 2 (Foundational)
 - `phase/05-implement/03-us1` = start of implementation Phase 3 (US1)
 - `phase/05-implement/04-us2` = start of implementation Phase 4 (US2)
@@ -38,6 +48,16 @@ Example (after finishing Setup):
 `git push origin phase/05-implement/02-foundational`
 
 If you need to rename away from the old flat `phase/05-implement` tag to this hierarchical layout, delete the old tag first (local and remote).
+
+### Deleting a tag
+
+Delete locally:
+
+`git tag -d phase/00-init`
+
+Delete on origin:
+
+`git push origin :refs/tags/phase/00-init`
 
 ### Pushing tags
 
