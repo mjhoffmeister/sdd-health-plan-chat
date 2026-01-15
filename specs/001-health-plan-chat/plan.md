@@ -80,7 +80,7 @@ src/
     HealthPlanChat.Core/
     HealthPlanChat.Infrastructure.Redis/
     HealthPlanChat.Infrastructure.Search/
-    HealthPlanChat.Infrastructure.Foundry/
+    HealthPlanChat.Infrastructure.AgentFramework/
     HealthPlanChat.Infrastructure.Storage/
     HealthPlanChat.Infrastructure.Prompting/
     HealthPlanChat.Infrastructure.Prompting.UnitTests/
@@ -139,5 +139,5 @@ Re-check Constitution: PASS (security, simplicity, and testability preserved; ex
 3) Implement Core domain + a single Chat use case: session history load/append (via store), answer typing/labeling, reference formatting.
 4) Implement Infrastructure: Agent Framework chat agent (Foundry endpoint), AI Search retrieval, Blob ingestion, Managed Redis session store.
 5) Implement Web API endpoints per ./contracts/openapi.yaml.
-6) Implement Blazor UI: chat panel, references display, theme toggle, new session button.
+6) Implement Blazor UI: chat panel, references display, theme toggle, new session button; remove unused template demo/sample assets (e.g., weather sample-data) to keep the UI minimal.
 7) Add tests: Core unit tests for parsing/labeling/reference formatting; minimal API smoke tests.

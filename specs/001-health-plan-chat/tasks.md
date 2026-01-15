@@ -23,13 +23,13 @@
 
 **Purpose**: Initialize repo structure and baseline projects.
 
-- [ ] T001 Create top-level folders `src/`, `infra/terraform/`, `data/plan-materials/`
-- [ ] T002 Scaffold backend solution in `src/backend/HealthPlanChat.sln` (Core/Infrastructure/Bootstrapper/WebApi + test projects) and enable Central Package Management in `src/backend/Directory.Packages.props` with pinned versions: `Microsoft.Agents.AI` `1.0.0-preview.260108.1`, `Azure.Search.Documents` `11.7.0`, `Azure.Storage.Blobs` `12.27.0`, `Azure.Identity` `1.17.1`, `Microsoft.Azure.StackExchangeRedis` `3.3.1`, `FluentResults` `4.0.0`, `xunit` `2.9.3`, `xunit.runner.visualstudio` `3.1.5`, `Microsoft.NET.Test.Sdk` `18.0.1`, `FluentAssertions` `8.8.0`, `Moq` `4.20.72`
-- [ ] T003 [P] Delete generated placeholders (e.g., `src/backend/**/Class1.cs`, `src/backend/**/UnitTest1.cs`)
-- [ ] T004 [P] Scaffold Blazor WebAssembly app in `src/frontend/HealthPlanChat.Web/`
-- [ ] T005 [P] Add local dev settings template in `src/backend/HealthPlanChat.WebApi/appsettings.Development.json` (no secrets)
-- [ ] T006 [P] Add repo-level ignore and tooling files (e.g., `.gitignore`, `.editorconfig`) aligned with .NET + Blazor
-- [ ] T007 [P] Add synthetic plan JSON seed files under `data/plan-materials/` (HMO/PPO/EPO examples for Contoso Health)
+- [X] T001 Create top-level folders `src/`, `infra/terraform/`, `data/plan-materials/`
+- [X] T002 Scaffold backend solution in `src/backend/HealthPlanChat.sln` (Core/Infrastructure/Bootstrapper/WebApi + test projects) and enable Central Package Management in `src/backend/Directory.Packages.props` with pinned versions: `Microsoft.Agents.AI` `1.0.0-preview.260108.1`, `Azure.Search.Documents` `11.7.0`, `Azure.Storage.Blobs` `12.27.0`, `Azure.Identity` `1.17.1`, `Microsoft.Azure.StackExchangeRedis` `3.3.1`, `FluentResults` `4.0.0`, `xunit` `2.9.3`, `xunit.runner.visualstudio` `3.1.5`, `Microsoft.NET.Test.Sdk` `18.0.1`, `FluentAssertions` `8.8.0`, `Moq` `4.20.72`
+- [X] T003 [P] Delete generated placeholders (e.g., `src/backend/**/Class1.cs`, `src/backend/**/UnitTest1.cs`)
+- [X] T004 [P] Scaffold Blazor WebAssembly app in `src/frontend/HealthPlanChat.Web/` and remove template demo/sample assets (e.g., `src/frontend/HealthPlanChat.Web/wwwroot/sample-data/weather.json`) and any unused template wiring that depends on them
+- [X] T005 [P] Add local dev settings template in `src/backend/HealthPlanChat.WebApi/appsettings.Development.json` (no secrets)
+- [X] T006 [P] Add repo-level ignore and tooling files (e.g., `.gitignore`, `.editorconfig`) aligned with .NET + Blazor
+- [X] T007 [P] Add synthetic plan JSON seed files under `data/plan-materials/` (HMO/PPO/EPO examples for Contoso Health)
 
 ---
 
@@ -40,7 +40,7 @@
 - [ ] T008 Create shared API contracts (DTOs) in `src/backend/HealthPlanChat.Core/UseCases/Contracts/`
 - [ ] T009 Create domain models in `src/backend/HealthPlanChat.Core/Domain/Chat/` (ChatSession, ChatMessage, AnswerType, Reference)
 - [ ] T010 Create external interfaces in `src/backend/HealthPlanChat.Core/ExternalInterfaces/` (IChatSessionStore, IPlanMaterialSearch, IChatAgent)
-- [ ] T011 Define configuration binding in `src/backend/HealthPlanChat.WebApi/Configuration/` and keep provider-specific option types in their Infrastructure projects (e.g., `src/backend/HealthPlanChat.Infrastructure.Redis/RedisOptions.cs`, `src/backend/HealthPlanChat.Infrastructure.Search/SearchOptions.cs`, `src/backend/HealthPlanChat.Infrastructure.Foundry/FoundryOptions.cs`)
+- [ ] T011 Define configuration binding in `src/backend/HealthPlanChat.WebApi/Configuration/` and keep provider-specific option types in their Infrastructure projects (e.g., `src/backend/HealthPlanChat.Infrastructure.Redis/RedisOptions.cs`, `src/backend/HealthPlanChat.Infrastructure.Search/SearchOptions.cs`, `src/backend/HealthPlanChat.Infrastructure.AgentFramework/FoundryOptions.cs`)
 - [ ] T012 Implement minimal API host skeleton in `src/backend/HealthPlanChat.WebApi/Program.cs` (healthz + routing)
 - [ ] T013 Implement structured logging + safe error handling middleware in `src/backend/HealthPlanChat.WebApi/Middleware/` and create a lightweight threat model + abuse cases doc in `specs/001-health-plan-chat/security.md` (prompt injection, data exfiltration, logging/redaction, session id handling, Azure integration risks)
 - [ ] T014 Implement Bootstrapper DI registration in `src/backend/HealthPlanChat.Bootstrapper/ServiceCollectionExtensions.cs`
@@ -62,7 +62,7 @@
 
 - [ ] T029 [P] Implement Azure Managed Redis-backed `IChatSessionStore` using `Microsoft.Azure.StackExchangeRedis` in `src/backend/HealthPlanChat.Infrastructure.Redis/RedisChatSessionStore.cs` (TTL, ordered messages, per-session keying)
 - [ ] T030 [P] Implement Azure AI Search adapter in `src/backend/HealthPlanChat.Infrastructure.Search/AzureAiSearchPlanMaterialSearch.cs`
-- [ ] T031 [P] Implement `IChatAgent` using Agent Framework targeting Azure AI Foundry (`Microsoft.Agents.AI` `1.0.0-preview.260108.1`) in `src/backend/HealthPlanChat.Infrastructure.Foundry/AgentFrameworkChatAgent.cs`
+- [ ] T031 [P] Implement `IChatAgent` using Agent Framework targeting Azure AI Foundry (`Microsoft.Agents.AI` `1.0.0-preview.260108.1`) in `src/backend/HealthPlanChat.Infrastructure.AgentFramework/AgentFrameworkChatAgent.cs`
 - [ ] T032 Add plan-material upload/indexing helper in `src/backend/HealthPlanChat.Infrastructure.Storage/PlanMaterialBlobPublisher.cs` (upload JSON from `data/plan-materials/` to Blob; trigger indexing)
 - [ ] T033 Add frontend HTTP client wiring in `src/frontend/HealthPlanChat.Web/Program.cs` and `src/frontend/HealthPlanChat.Web/Services/ApiClient.cs`
 
