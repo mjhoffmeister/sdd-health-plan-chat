@@ -15,8 +15,6 @@ phases.
 
 Each phase produces durable artifacts that constrain and guide the next phase.
 
-If you're evolving the staged demo itself (including tag/checkpoint strategy), see MAINTAINERS.md.
-
 ## Init Phase (Phase 00)
 
 Goal: generate the Spec Kit files so you can begin the constitution phase.
@@ -57,10 +55,9 @@ Goal: create the first feature specification in
 `specs/<feature-branch>/spec.md`.
 
 Note: Spec Kit scripts write to `specs/<feature-branch>/...` based on your
-current git branch name. If you are on `main` or a detached phase tag, switch to
-your feature branch (e.g., `001-health-plan-chat`) before generating spec/plan/
-tasks artifacts. If you are not using git, set `SPECIFY_FEATURE` to the feature
-folder name.
+current git branch name. If you are on `main`, switch to your feature branch
+(e.g., `001-health-plan-chat`) before generating spec/plan/tasks artifacts. If
+you are not using git, set `SPECIFY_FEATURE` to the feature folder name.
 
 ### Generate the spec
 
@@ -84,10 +81,10 @@ Chat, run:
 
 Goal: turn the plan into actionable implementation tasks in
 `specs/<feature-branch>/tasks.md`.
-Note: If you are on `main` or a detached phase tag (including `phase/04-tasks`),
-switch to your feature branch (e.g., `001-health-plan-chat`) before running
-`/speckit.tasks`, or set `SPECIFY_FEATURE` to the feature folder name. The
-default branch may already include a sample generated tasks file.
+Note: If you are on `main`, switch to your feature branch (e.g.,
+`001-health-plan-chat`) before running `/speckit.tasks`, or set `SPECIFY_FEATURE`
+to the feature folder name. The default branch may already include a sample
+generated tasks file.
 
 ### Generate the tasks
 
@@ -115,8 +112,6 @@ Goal: implement the feature by executing tasks in `specs/<feature-branch>/tasks.
 - T001–T007
 
 3) Check in your Setup implementation.
-
-If you're using tag-based checkpoints for demos, see MAINTAINERS.md.
 
 ### Pre-flight
 
