@@ -1,0 +1,73 @@
+{
+  "planDocumentId": "contoso-ppo-silver-2026",
+  "planName": "Contoso Health PPO Silver",
+  "planType": "PPO",
+  "year": 2026,
+  "issuer": "Contoso Health Insurance",
+  "sections": [
+    {
+      "heading": "Plan Overview",
+      "content": "The Contoso Health PPO Silver plan offers flexible health coverage that allows you to see any healthcare provider without a referral. While you can use out-of-network providers, you will save the most by using in-network providers. No primary care physician selection is required."
+    },
+    {
+      "heading": "Monthly Premiums",
+      "content": "Individual coverage: $380/month. Individual + Spouse: $760/month. Family coverage: $1,140/month. Premiums are due on the first of each month."
+    },
+    {
+      "heading": "Deductibles",
+      "content": "In-network: $1,500 individual / $3,000 family. Out-of-network: $3,000 individual / $6,000 family. The deductible applies to most services except preventive care, which is covered at 100% before the deductible when received in-network."
+    },
+    {
+      "heading": "Out-of-Pocket Maximum",
+      "content": "In-network: $6,500 individual / $13,000 family. Out-of-network: $13,000 individual / $26,000 family. Once you reach this limit, the plan pays 100% of covered services for the remainder of the plan year."
+    },
+    {
+      "heading": "Primary Care Visits",
+      "content": "In-network PCP visits: $30 copay after deductible. Out-of-network: 40% coinsurance after deductible. Annual wellness visits are covered at 100% in-network with no copay or deductible."
+    },
+    {
+      "heading": "Specialist Visits",
+      "content": "No referral required for specialist visits. In-network specialist visits: $50 copay after deductible. Out-of-network: 40% coinsurance after deductible. You have the freedom to see any specialist directly."
+    },
+    {
+      "heading": "Emergency Services",
+      "content": "Emergency room visits: $300 copay (waived if admitted). Urgent care visits: $75 copay in-network, $100 out-of-network. Emergency services are covered at in-network rates regardless of where you receive care."
+    },
+    {
+      "heading": "Hospital Services",
+      "content": "In-network inpatient hospital stays: 25% coinsurance after deductible. Out-of-network: 40% coinsurance after deductible. Prior authorization recommended but not required for non-emergency admissions."
+    },
+    {
+      "heading": "Prescription Drug Coverage",
+      "content": "Tier 1 (Generic): $15 copay. Tier 2 (Preferred Brand): $45 copay. Tier 3 (Non-Preferred Brand): $75 copay. Tier 4 (Specialty): 30% coinsurance up to $300. Prescriptions can be filled at any pharmacy; in-network pharmacies offer lower costs."
+    },
+    {
+      "heading": "Mental Health Services",
+      "content": "In-network outpatient mental health visits: $30 copay. Out-of-network: 40% coinsurance. Inpatient mental health: 25% coinsurance in-network, 40% out-of-network. Telehealth mental health visits are available at $20 copay."
+    },
+    {
+      "heading": "Preventive Care",
+      "content": "In-network preventive care is covered at 100% with no copay or deductible. This includes annual physicals, immunizations, cancer screenings, and well-child visits. Out-of-network preventive care is subject to deductible and 40% coinsurance."
+    },
+    {
+      "heading": "Dental and Vision",
+      "content": "Dental and vision are optional add-ons for this plan. Dental add-on: $25/month for basic coverage. Vision add-on: $10/month. Contact Member Services to add these benefits to your plan."
+    },
+    {
+      "heading": "Network Flexibility",
+      "content": "This is a PPO plan with nationwide network access. You may see any licensed provider. In-network providers have agreed to discounted rates, saving you money. Out-of-network providers may balance bill you for amounts above our allowed charges."
+    },
+    {
+      "heading": "Prior Authorization",
+      "content": "Prior authorization is recommended but not required for most services. However, obtaining prior authorization ensures coverage and may reduce your out-of-pocket costs. Services that benefit from prior authorization include: elective surgeries, specialty medications, and high-cost imaging."
+    },
+    {
+      "heading": "Claims and Reimbursement",
+      "content": "In-network providers bill us directly. For out-of-network care, you may need to pay upfront and submit a claim for reimbursement. Claim forms are available at contoso-health.example.com/claims. Reimbursement is based on our allowed amount, not the provider's billed charges."
+    },
+    {
+      "heading": "Appeals Process",
+      "content": "If a claim is denied, you may file an appeal within 180 days. Appeals are reviewed within 30 days for pre-service and 60 days for post-service. External review is available for final adverse determinations. Contact Member Services at 1-800-CONTOSO for assistance."
+    }
+  ]
+}

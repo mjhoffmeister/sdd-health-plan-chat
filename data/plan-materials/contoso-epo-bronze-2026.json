@@ -1,0 +1,73 @@
+{
+  "planDocumentId": "contoso-epo-bronze-2026",
+  "planName": "Contoso Health EPO Bronze",
+  "planType": "EPO",
+  "year": 2026,
+  "issuer": "Contoso Health Insurance",
+  "sections": [
+    {
+      "heading": "Plan Overview",
+      "content": "The Contoso Health EPO Bronze plan offers affordable health coverage with access to a broad network of providers. Like a PPO, you don't need referrals to see specialists. However, like an HMO, coverage is limited to in-network providers except for emergencies. This plan is ideal for budget-conscious individuals who want flexibility within a network."
+    },
+    {
+      "heading": "Monthly Premiums",
+      "content": "Individual coverage: $275/month. Individual + Spouse: $550/month. Family coverage: $825/month. Premiums are due on the first of each month. This is our most affordable plan option."
+    },
+    {
+      "heading": "Deductibles",
+      "content": "Annual deductible: $3,000 individual / $6,000 family. The deductible applies to most services including specialist visits and hospital care. Preventive care is covered at 100% before the deductible."
+    },
+    {
+      "heading": "Out-of-Pocket Maximum",
+      "content": "Annual out-of-pocket maximum: $8,500 individual / $17,000 family. Once you reach this limit, the plan pays 100% of covered in-network services for the remainder of the plan year."
+    },
+    {
+      "heading": "Primary Care Visits",
+      "content": "PCP office visits: 30% coinsurance after deductible. First three PCP visits per year have a $35 copay (deductible waived). Annual wellness visits are covered at 100% with no copay or deductible."
+    },
+    {
+      "heading": "Specialist Visits",
+      "content": "No referral required for specialist visits within the network. Specialist visits: 30% coinsurance after deductible. You can see any in-network specialist directly without PCP approval."
+    },
+    {
+      "heading": "Emergency Services",
+      "content": "Emergency room visits: $400 copay plus 30% coinsurance (copay waived if admitted). Urgent care visits: $60 copay. Emergency services are the only out-of-network care covered by this plan."
+    },
+    {
+      "heading": "Hospital Services",
+      "content": "Inpatient hospital stays: 30% coinsurance after deductible. Prior authorization required for all non-emergency admissions. Outpatient surgery: 30% coinsurance after deductible."
+    },
+    {
+      "heading": "Prescription Drug Coverage",
+      "content": "Tier 1 (Generic): $15 copay (deductible waived). Tier 2 (Preferred Brand): 25% coinsurance after deductible. Tier 3 (Non-Preferred Brand): 40% coinsurance after deductible. Tier 4 (Specialty): 40% coinsurance up to $400 after deductible. Mail-order available for maintenance medications."
+    },
+    {
+      "heading": "Mental Health Services",
+      "content": "Outpatient mental health visits: 30% coinsurance after deductible. Inpatient mental health: 30% coinsurance after deductible. Telehealth mental health visits are available at 30% coinsurance. No prior authorization required for outpatient mental health."
+    },
+    {
+      "heading": "Preventive Care",
+      "content": "Preventive care is covered at 100% with no copay or deductible when received from in-network providers. This includes annual physicals, immunizations, recommended cancer screenings, and well-child visits through age 18."
+    },
+    {
+      "heading": "Dental and Vision",
+      "content": "This plan does not include dental or vision coverage. Separate dental and vision plans are available for purchase. Contact Member Services for information on standalone dental and vision options."
+    },
+    {
+      "heading": "Network Requirements",
+      "content": "This is an EPO (Exclusive Provider Organization) plan. All care except emergencies must be received from in-network providers. Out-of-network care is not covered. Our network includes over 50,000 providers nationwide. Verify provider participation at contoso-health.example.com/providers."
+    },
+    {
+      "heading": "Prior Authorization",
+      "content": "Prior authorization is required for: all non-emergency hospital admissions, specialty medications (Tier 4), MRI/CT/PET scans, outpatient surgery, and home health services. Obtain prior authorization by calling 1-800-CONTOSO-PA or through our member portal."
+    },
+    {
+      "heading": "Telehealth Services",
+      "content": "Telehealth visits for primary care and behavioral health are available 24/7 through our partner ContosoMD. Virtual visits: $0 copay for the first 5 visits per year, then 30% coinsurance. Download the ContosoMD app or visit contoso-health.example.com/telehealth."
+    },
+    {
+      "heading": "Appeals Process",
+      "content": "If a claim is denied, you may file an appeal within 180 days of the denial notice. Expedited appeals for urgent situations are reviewed within 72 hours. Standard appeals are reviewed within 30 days. External review available for final adverse determinations."
+    }
+  ]
+}

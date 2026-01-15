@@ -1,0 +1,69 @@
+{
+  "planDocumentId": "contoso-hmo-gold-2026",
+  "planName": "Contoso Health HMO Gold",
+  "planType": "HMO",
+  "year": 2026,
+  "issuer": "Contoso Health Insurance",
+  "sections": [
+    {
+      "heading": "Plan Overview",
+      "content": "The Contoso Health HMO Gold plan provides comprehensive health coverage with a focus on coordinated care through a primary care physician (PCP). This plan requires members to choose a PCP from our network who will coordinate all healthcare services and provide referrals to specialists when needed."
+    },
+    {
+      "heading": "Monthly Premiums",
+      "content": "Individual coverage: $450/month. Individual + Spouse: $900/month. Family coverage: $1,350/month. Premiums are due on the first of each month."
+    },
+    {
+      "heading": "Deductibles",
+      "content": "Annual deductible: $500 individual / $1,000 family. The deductible applies to most services except preventive care, which is covered at 100% before the deductible."
+    },
+    {
+      "heading": "Out-of-Pocket Maximum",
+      "content": "Annual out-of-pocket maximum: $4,000 individual / $8,000 family. Once you reach this limit, the plan pays 100% of covered services for the remainder of the plan year."
+    },
+    {
+      "heading": "Primary Care Visits",
+      "content": "PCP office visits: $20 copay after deductible. Annual wellness visits and preventive screenings are covered at 100% with no copay. You must select a PCP within 30 days of enrollment."
+    },
+    {
+      "heading": "Specialist Visits",
+      "content": "Specialist visits require a referral from your PCP. Specialist office visits: $40 copay after deductible. Some specialists may require prior authorization for certain procedures."
+    },
+    {
+      "heading": "Emergency Services",
+      "content": "Emergency room visits: $250 copay (waived if admitted). Urgent care visits: $50 copay. Emergency services are covered worldwide, but non-emergency out-of-network care is not covered except in specific circumstances."
+    },
+    {
+      "heading": "Hospital Services",
+      "content": "Inpatient hospital stays: 20% coinsurance after deductible. Prior authorization required for non-emergency admissions. Maximum of 120 days per benefit period."
+    },
+    {
+      "heading": "Prescription Drug Coverage",
+      "content": "Tier 1 (Generic): $10 copay. Tier 2 (Preferred Brand): $35 copay. Tier 3 (Non-Preferred Brand): $60 copay. Tier 4 (Specialty): 25% coinsurance up to $250. Mail-order prescriptions receive a 90-day supply for the price of 2 copays."
+    },
+    {
+      "heading": "Mental Health Services",
+      "content": "Outpatient mental health visits: $20 copay (same as PCP visit). Inpatient mental health: 20% coinsurance after deductible. Substance abuse treatment is covered under the same terms. No lifetime limits on mental health benefits."
+    },
+    {
+      "heading": "Preventive Care",
+      "content": "Annual physical exams, immunizations, cancer screenings (mammograms, colonoscopies, Pap tests), and well-child visits are covered at 100% with no copay or deductible. Preventive care must be received from in-network providers."
+    },
+    {
+      "heading": "Dental and Vision",
+      "content": "Basic dental and vision coverage is included. Dental: Two cleanings per year, basic restorative services at 50% after $50 deductible. Vision: One eye exam per year, $150 allowance for frames/lenses every 2 years."
+    },
+    {
+      "heading": "Network Requirements",
+      "content": "This is an HMO plan. All non-emergency care must be received from in-network providers. Out-of-network care is not covered except for emergency services. Check our provider directory at contoso-health.example.com/providers."
+    },
+    {
+      "heading": "Prior Authorization",
+      "content": "Prior authorization is required for: non-emergency hospital admissions, specialty medications, MRI/CT scans, outpatient surgery, durable medical equipment over $500, and home health services. Failure to obtain prior authorization may result in claim denial."
+    },
+    {
+      "heading": "Appeals Process",
+      "content": "If a claim is denied, you may file an appeal within 180 days. Level 1 appeals are reviewed within 30 days. Level 2 external reviews are available through an independent review organization. Contact Member Services at 1-800-CONTOSO for assistance."
+    }
+  ]
+}
