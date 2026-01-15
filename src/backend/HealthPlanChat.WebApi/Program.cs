@@ -1,12 +1,31 @@
+using HealthPlanChat.Bootstrapper;
+using HealthPlanChat.WebApi.Configuration;
+using HealthPlanChat.WebApi.Middleware;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// Bind configuration sections
+builder.Services.Configure<AppOptions>(builder.Configuration.GetSection(AppOptions.SectionKey));
+builder.Services.Configure<RetrievalOptions>(builder.Configuration.GetSection(RetrievalOptions.SectionKey));
+
+// Add OpenAPI/Swagger
 builder.Services.AddOpenApi();
+
+// Add health checks
+builder.Services.AddHealthChecks();
+
+// Add application services via Bootstrapper
+builder.Services.AddHealthPlanChatServices(builder.Configuration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Add structured logging first (to capture all requests)
+app.UseStructuredLogging();
+
+// Add safe error handling
+app.UseSafeErrorHandling();
+
+// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -14,28 +33,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+// Health check endpoint
+app.MapHealthChecks("/healthz");
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+// TODO: Map chat endpoints (Phase 3)
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

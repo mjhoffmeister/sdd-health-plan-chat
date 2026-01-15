@@ -1,0 +1,146 @@
+name: Application Build and Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'demo'
+        type: choice
+        options:
+          - demo
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'data/**'
+      - '.github/workflows/app.yml'
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  BACKEND_PROJECT: src/backend/HealthPlanChat.WebApi/HealthPlanChat.WebApi.csproj
+  FRONTEND_PROJECT: src/frontend/HealthPlanChat.Web/HealthPlanChat.Web.csproj
+
+jobs:
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore src/backend/HealthPlanChat.slnx
+
+      - name: Build backend
+        run: dotnet build ${{ env.BACKEND_PROJECT }} --configuration Release --no-restore
+
+      - name: Run backend tests
+        run: dotnet test src/backend/HealthPlanChat.slnx --configuration Release --no-build --verbosity normal
+
+      - name: Publish backend
+        run: dotnet publish ${{ env.BACKEND_PROJECT }} --configuration Release --output ./publish/backend
+
+      - name: Build frontend
+        run: dotnet build ${{ env.FRONTEND_PROJECT }} --configuration Release
+
+      - name: Publish frontend
+        run: dotnet publish ${{ env.FRONTEND_PROJECT }} --configuration Release --output ./publish/frontend
+
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend
+          path: ./publish/backend
+
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend
+          path: ./publish/frontend/wwwroot
+
+      - name: Upload plan materials
+        uses: actions/upload-artifact@v4
+        with:
+          name: plan-materials
+          path: ./data/plan-materials
+
+  deploy:
+    name: Deploy to Azure
+    runs-on: ubuntu-latest
+    needs: build
+    environment: ${{ inputs.environment || 'demo' }}
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download backend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend
+          path: ./publish/backend
+
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend
+          path: ./publish/frontend
+
+      - name: Download plan materials
+        uses: actions/download-artifact@v4
+        with:
+          name: plan-materials
+          path: ./data/plan-materials
+
+      - name: Azure Login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy Backend to App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_APP_SERVICE_NAME }}
+          package: ./publish/backend
+
+      - name: Deploy Frontend to Static Web Apps
+        run: |
+          az staticwebapp deploy \
+            --app-name ${{ vars.AZURE_SWA_NAME }} \
+            --resource-group ${{ vars.AZURE_RESOURCE_GROUP_NAME }} \
+            --source ./publish/frontend \
+            --no-build
+
+      - name: Sync Plan Materials to Blob Storage
+        run: |
+          echo "Syncing plan materials to Azure Blob Storage (only changed files)..."
+          az storage blob sync \
+            --account-name ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }} \
+            --container plan-materials \
+            --source ./data/plan-materials \
+            --auth-mode login
+          echo "Sync complete. Search indexer will auto-trigger on blob changes."
+
+      - name: Deployment Summary
+        run: |
+          echo "## Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Backend**: https://${{ vars.AZURE_APP_SERVICE_NAME }}.azurewebsites.net" >> $GITHUB_STEP_SUMMARY
+          echo "- **Frontend**: https://${{ vars.AZURE_SWA_HOSTNAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Health Check**: https://${{ vars.AZURE_APP_SERVICE_NAME }}.azurewebsites.net/healthz" >> $GITHUB_STEP_SUMMARY

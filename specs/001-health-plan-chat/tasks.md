@@ -37,34 +37,36 @@
 
 **Purpose**: Cross-cutting backend/frontend foundations that all user stories rely on.
 
-- [ ] T008 Create shared API contracts (DTOs) in `src/backend/HealthPlanChat.Core/UseCases/Contracts/`
-- [ ] T009 Create domain models in `src/backend/HealthPlanChat.Core/Domain/Chat/` (ChatSession, ChatMessage, AnswerType, Reference)
-- [ ] T010 Create external interfaces in `src/backend/HealthPlanChat.Core/ExternalInterfaces/` (IChatSessionStore, IPlanMaterialSearch, IChatAgent)
-- [ ] T011 Define configuration binding in `src/backend/HealthPlanChat.WebApi/Configuration/` and keep provider-specific option types in their Infrastructure projects (e.g., `src/backend/HealthPlanChat.Infrastructure.Redis/RedisOptions.cs`, `src/backend/HealthPlanChat.Infrastructure.Search/SearchOptions.cs`, `src/backend/HealthPlanChat.Infrastructure.AgentFramework/FoundryOptions.cs`)
-- [ ] T012 Implement minimal API host skeleton in `src/backend/HealthPlanChat.WebApi/Program.cs` (healthz + routing)
-- [ ] T013 Implement structured logging + safe error handling middleware in `src/backend/HealthPlanChat.WebApi/Middleware/` and create a lightweight threat model + abuse cases doc in `specs/001-health-plan-chat/security.md` (prompt injection, data exfiltration, logging/redaction, session id handling, Azure integration risks)
-- [ ] T014 Implement Bootstrapper DI registration in `src/backend/HealthPlanChat.Bootstrapper/ServiceCollectionExtensions.cs`
+- [X] T008 Create shared API contracts (DTOs) in `src/backend/HealthPlanChat.Core/UseCases/Contracts/`
+- [X] T009 Create domain models in `src/backend/HealthPlanChat.Core/Domain/Chat/` (ChatSession, ChatMessage, AnswerType, Reference)
+- [X] T010 Create external interfaces in `src/backend/HealthPlanChat.Core/ExternalInterfaces/` (IChatSessionStore, IPlanMaterialSearch, IChatAgent)
+- [X] T011 Define configuration binding in `src/backend/HealthPlanChat.WebApi/Configuration/` and keep provider-specific option types in their Infrastructure projects (e.g., `src/backend/HealthPlanChat.Infrastructure.Redis/RedisOptions.cs`, `src/backend/HealthPlanChat.Infrastructure.Search/SearchOptions.cs`, `src/backend/HealthPlanChat.Infrastructure.AgentFramework/FoundryOptions.cs`)
+- [X] T012 Implement minimal API host skeleton in `src/backend/HealthPlanChat.WebApi/Program.cs` (healthz + routing)
+- [X] T013 Implement structured logging + safe error handling middleware in `src/backend/HealthPlanChat.WebApi/Middleware/` and create a lightweight threat model + abuse cases doc in `specs/001-health-plan-chat/security.md` (prompt injection, data exfiltration, logging/redaction, session id handling, Azure integration risks)
+- [X] T014 Implement Bootstrapper DI registration in `src/backend/HealthPlanChat.Bootstrapper/ServiceCollectionExtensions.cs`
 
-- [ ] T015 [P] Add Terraform provider + backend skeleton in `infra/terraform/providers.tf` (use AzAPI provider pinned to `2.8.0` in `required_providers`)
-- [ ] T016 [P] Add Terraform remote state bootstrap script for a self-bootstrapping pipeline (Pattern 2) in `infra/terraform/state-bootstrap.ps1` (idempotently create RG + Storage Account + Container for Terraform state and assign `Storage Blob Data Contributor` to the GitHub Actions WIF identity; intended to run from GitHub Actions)
-- [ ] T017 Configure Terraform remote state backend in `infra/terraform/providers.tf` using `backend "azurerm" {}` and pass concrete backend settings via `-backend-config` from the workflow (single demo environment: one storage account/container/key; avoid hardcoding names in code)
-- [ ] T018 [P] Add Terraform resources for App Service + plan in `infra/terraform/appservice.tf`
-- [ ] T019 [P] Add Terraform resources for Static Web Apps in `infra/terraform/swa.tf`
-- [ ] T020 [P] Add Terraform resources for Azure AI Search + index in `infra/terraform/search.tf`
-- [ ] T021 [P] Add Terraform resources for Storage account + container in `infra/terraform/storage.tf`
-- [ ] T022 [P] Add Terraform resources for Azure Managed Redis (Redis Enterprise) in `infra/terraform/redis.tf` using AzAPI: `Microsoft.Cache/redisEnterprise@2025-04-01` AND the required child `Microsoft.Cache/redisEnterprise/databases@2025-04-01` (create `default` database)
-- [ ] T023 [P] Add Terraform resources for Azure AI Foundry / Azure AI Services account in `infra/terraform/foundry.tf`
-- [ ] T024 [P] Add Terraform model deployments for `gpt-5-mini` and `text-embedding-3-small` in `infra/terraform/foundry.deployments.tf`
-- [ ] T025 [P] Add GitHub Actions Workload Identity Federation (WIF/OIDC) setup in `infra/terraform/identity.tf`: create a new Entra application registration (no pre-existing app), ensure its service principal exists in the tenant, add federated identity credential(s) scoped to this repo, and output values needed by workflows (`AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_CLIENT_ID`)
-- [ ] T026 [P] Add Terraform role assignments co-located with the owning resources: App Service managed identity access in `infra/terraform/appservice.tf` (Search/Storage/Foundry/Redis as needed) and any service-specific roles in their respective files (`infra/terraform/search.tf`, `infra/terraform/storage.tf`, `infra/terraform/foundry.tf`, `infra/terraform/redis.tf`)
-- [ ] T027 Add GitHub Actions workflow for infra deploy (WIF/OIDC + `workflow_dispatch`) in `.github/workflows/infra.yml` implementing Pattern 2: `azure/login` (OIDC) → run `infra/terraform/state-bootstrap.ps1` → `terraform init` with `-backend-config` → `terraform plan/apply` (no client secrets)
-- [ ] T028 Add GitHub Actions workflow for app build/deploy (WIF/OIDC + `workflow_dispatch`) in `.github/workflows/app.yml` (use `azure/login` with `client-id/tenant-id/subscription-id`; deploy backend/frontend without secrets on runners)
+- [X] T015 [P] Add Terraform provider + backend skeleton in `infra/terraform/providers.tf` (use AzAPI provider pinned to `2.8.0` in `required_providers`)
+- [X] T016 [P] Add Terraform remote state bootstrap script for a self-bootstrapping pipeline (Pattern 2) in `infra/terraform/state-bootstrap.ps1` (idempotently create RG + Storage Account + Container for Terraform state and assign `Storage Blob Data Contributor` to the GitHub Actions WIF identity; intended to run from GitHub Actions)
+- [X] T017 Configure Terraform remote state backend in `infra/terraform/providers.tf` using `backend "azurerm" {}` and pass concrete backend settings via `-backend-config` from the workflow (single demo environment: one storage account/container/key; avoid hardcoding names in code)
+- [X] T018 [P] Add Terraform resources for App Service + plan in `infra/terraform/appservice.tf`
+- [X] T019 [P] Add Terraform resources for Static Web Apps in `infra/terraform/swa.tf`
+- [X] T020 [P] Add Terraform resources for Azure AI Search in `infra/terraform/search.tf`: (1) Search service with system-assigned managed identity, (2) Index schema with vector field, (3) Data source connecting to Blob container, (4) Skillset with `AzureOpenAIEmbedding` skill calling `text-embedding-3-small`, (5) Indexer with blob trigger and JSON parsing
+- [X] T021 [P] Add Terraform resources for Storage account + container in `infra/terraform/storage.tf`
+- [X] T022 [P] Add Terraform resources for Azure Managed Redis (Redis Enterprise) in `infra/terraform/redis.tf` using AzAPI: `Microsoft.Cache/redisEnterprise@2025-04-01` AND the required child `Microsoft.Cache/redisEnterprise/databases@2025-04-01` (create `default` database)
+- [X] T023 [P] Add Terraform resources for Azure AI Foundry / Azure AI Services account in `infra/terraform/foundry.tf`
+- [X] T024 [P] Add Terraform model deployments for `gpt-5-mini` and `text-embedding-3-small` in `infra/terraform/foundry.deployments.tf`
+- [X] T025 [P] Add GitHub Actions Workload Identity Federation (WIF/OIDC) setup in `infra/terraform/identity.tf`: create a new Entra application registration (no pre-existing app), ensure its service principal exists in the tenant, add federated identity credential(s) scoped to this repo, and output values needed by workflows (`AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_CLIENT_ID`)
+- [X] T026 [P] Add Terraform role assignments co-located with the owning resources: App Service managed identity access in `infra/terraform/appservice.tf` (Search Index Data Reader for AI Search, Cognitive Services User for AI Foundry; no Blob Storage role—indexed content accessed via Search); Search Service managed identity in `infra/terraform/search.tf` (Storage Blob Data Reader for blob access, Cognitive Services User for embedding skillset); any service-specific roles in their respective files (`infra/terraform/foundry.tf`, `infra/terraform/redis.tf`)
+- [X] T027 Add GitHub Actions workflow for infra deploy (WIF/OIDC + `workflow_dispatch`) in `.github/workflows/infra.yml` implementing Pattern 2: `azure/login` (OIDC) → run `infra/terraform/state-bootstrap.ps1` → `terraform init` with `-backend-config` → `terraform plan/apply` (no client secrets)
+- [X] T028 Add GitHub Actions workflow for app build/deploy (WIF/OIDC + `workflow_dispatch`) in `.github/workflows/app.yml`: use `azure/login` with `client-id/tenant-id/subscription-id`; deploy backend via `azure/webapps-deploy`; deploy frontend via `az staticwebapp deploy` (CLI-based, WIF-compatible—no deployment token needed); sync plan materials via `az storage blob sync`
+- [X] T028a [P] Add missing Terraform outputs in `infra/terraform/outputs.tf`: `app_service_name`, `storage_account_name`, `static_web_app_name`, `static_web_app_hostname`, `resource_group_name` (for GitHub Environment variables consumed by `app.yml`)
+- [X] T028b Create GitHub Environment bootstrap script in `scripts/setup-github-env.ps1`: read Terraform outputs, create GitHub Environment via `gh api`, populate variables (`AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_APP_SERVICE_NAME`, `AZURE_STORAGE_ACCOUNT_NAME`, `AZURE_SWA_NAME`, `AZURE_SWA_HOSTNAME`, `AZURE_RESOURCE_GROUP_NAME`) from Terraform outputs; requires GitHub CLI and PAT with `admin:repo` scope (for environment creation)
 
-- [ ] T029 [P] Implement Azure Managed Redis-backed `IChatSessionStore` using `Microsoft.Azure.StackExchangeRedis` in `src/backend/HealthPlanChat.Infrastructure.Redis/RedisChatSessionStore.cs` (TTL, ordered messages, per-session keying)
-- [ ] T030 [P] Implement Azure AI Search adapter in `src/backend/HealthPlanChat.Infrastructure.Search/AzureAiSearchPlanMaterialSearch.cs`
-- [ ] T031 [P] Implement `IChatAgent` using Agent Framework targeting Azure AI Foundry (`Microsoft.Agents.AI` `1.0.0-preview.260108.1`) in `src/backend/HealthPlanChat.Infrastructure.AgentFramework/AgentFrameworkChatAgent.cs`
-- [ ] T032 Add plan-material upload/indexing helper in `src/backend/HealthPlanChat.Infrastructure.Storage/PlanMaterialBlobPublisher.cs` (upload JSON from `data/plan-materials/` to Blob; trigger indexing)
-- [ ] T033 Add frontend HTTP client wiring in `src/frontend/HealthPlanChat.Web/Program.cs` and `src/frontend/HealthPlanChat.Web/Services/ApiClient.cs`
+- [X] T029 [P] Implement Azure Managed Redis-backed `IChatSessionStore` using `Microsoft.Azure.StackExchangeRedis` in `src/backend/HealthPlanChat.Infrastructure.Redis/RedisChatSessionStore.cs` (TTL, ordered messages, per-session keying)
+- [X] T030 [P] Implement Azure AI Search adapter in `src/backend/HealthPlanChat.Infrastructure.Search/AzureAiSearchPlanMaterialSearch.cs`
+- [X] T031 [P] Implement `IChatAgent` using Agent Framework targeting Azure AI Foundry (`Microsoft.Agents.AI` `1.0.0-preview.260108.1`) in `src/backend/HealthPlanChat.Infrastructure.AgentFramework/AgentFrameworkChatAgent.cs`
+- [X] T032 Add plan-material blob upload helper in `src/backend/HealthPlanChat.Infrastructure.Storage/PlanMaterialBlobPublisher.cs` (upload JSON from `data/plan-materials/` to Blob; Search indexer auto-triggers on blob changes)
+- [X] T033 Add frontend HTTP client wiring in `src/frontend/HealthPlanChat.Web/Program.cs` and `src/frontend/HealthPlanChat.Web/Services/ApiClient.cs`
 
 **Checkpoint**: Foundation ready — user story work can begin.
 
@@ -89,7 +91,7 @@
 - [ ] T042 [US1] Wire Azure implementations behind interfaces in `src/backend/HealthPlanChat.Bootstrapper/ServiceCollectionExtensions.cs`
 - [ ] T043 [US1] Add minimal runtime configuration + health checks in `src/backend/HealthPlanChat.WebApi/Program.cs` (validate required Azure settings on startup; include `/healthz`)
 - [ ] T044 [P] [US1] Add safe request/response logging filters in `src/backend/HealthPlanChat.WebApi/Middleware/` to avoid logging prompt/user content
-- [ ] T045 [US1] Add a “seed plan materials” workflow step or tool invocation in `.github/workflows/app.yml` (upload `data/plan-materials/` to Blob; trigger indexing)
+- [ ] T045 [US1] Add "sync plan materials" workflow step in `.github/workflows/app.yml`: use `az storage blob sync` to upload only changed files from `data/plan-materials/*.json` to Blob (avoids redundant uploads; Search indexer auto-triggers on blob changes)
 - [ ] T046 [P] [US1] Implement minimal chat UI page in `src/frontend/HealthPlanChat.Web/Pages/Chat.razor`
 - [ ] T047 [P] [US1] Implement chat state + session initialization in `src/frontend/HealthPlanChat.Web/Services/ChatSessionService.cs`
 - [ ] T048 [P] [US1] Render grounded references in UI in `src/frontend/HealthPlanChat.Web/Components/ReferencesList.razor`

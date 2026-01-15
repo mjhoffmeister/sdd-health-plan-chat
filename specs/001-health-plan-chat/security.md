@@ -66,8 +66,34 @@ This document captures the lightweight threat model and abuse cases required by 
 
 **Mitigations**:
 - Least privilege role assignments.
-- Separate roles per service (Search, Storage, Foundry).
+- Separate roles per service (Search, Foundry).
 - Avoid broad subscription-level roles.
+
+**App Service Managed Identity — Authorized Roles:**
+
+| Target Resource | Role | Justification |
+|-----------------|------|---------------|
+| AI Search | Search Index Data Reader | Runtime query of plan-materials index |
+| AI Foundry | Cognitive Services User | LLM inference (chat + embeddings) |
+
+**Excluded (not assigned):**
+
+| Target Resource | Role | Reason |
+|-----------------|------|--------|
+| Blob Storage | Storage Blob Data Reader | App queries Search index (which contains content); blobs are indexed by Search service, not accessed by app |
+
+**Search Service Managed Identity — Authorized Roles (for indexing):**
+
+| Target Resource | Role | Role Definition ID | Justification |
+|-----------------|------|-------------------|---------------|
+| Blob Storage | Storage Blob Data Reader | `2a2b9908-6ea1-4ae2-8e65-a410df84e7d1` | Read plan material blobs during indexing |
+| AI Foundry | Cognitive Services User | `a97b65f3-24c7-4388-baec-2e87135dc908` | Generate embeddings via AzureOpenAIEmbedding skillset |
+
+**GitHub Actions WIF Identity — Authorized Roles (for deployment):**
+
+| Target Resource | Role | Role Definition ID | Justification |
+|-----------------|------|-------------------|---------------|
+| Blob Storage | Storage Blob Data Contributor | `ba92f5b4-2d11-453d-a403-e96b0029c9fe` | Upload plan materials during CI/CD |
 
 ### 6) Excessive resource usage / cost (abuse)
 **Threat**: repeated requests cause high token usage and service cost.
