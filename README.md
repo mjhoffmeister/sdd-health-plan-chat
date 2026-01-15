@@ -15,75 +15,7 @@ phases.
 
 Each phase produces durable artifacts that constrain and guide the next phase.
 
-## For Demoers (jump ahead + rehearse safely)
-
-To see what checkpoint you're on:
-
-`git tag --points-at HEAD`
-
-### Phase tags (start-of-phase checkpoints)
-
-This repo uses Git tags to mark the **start** of each demo phase so you can
-reset/jump without accidentally “dirtying” a checkpoint.
-
-- `phase/00-init` = starting point before you run `specify init`
-- `phase/01-constitution` = starting point for generating the constitution
-- `phase/02-spec` = starting point for generating the first spec
-- `phase/03-plan` = starting point for generating the first plan
-- `phase/04-tasks` = starting point for generating the first tasks
-
-### Jump to a phase (fast)
-
-To return to the start of init:
-
-`git fetch --tags`
-
-`git switch --detach phase/00-init`
-
-Tip: using `--detach` avoids accidentally moving a branch pointer while
-presenting.
-
-Note: phase tags are maintained by repo maintainers. If you're extending the
-demo and managing tags, see MAINTAINERS.md.
-
-### Smoothest live demo: worktrees (multiple phase folders)
-
-Git worktrees let you have multiple folders checked out at different phases at
-the same time, so you can jump by switching windows instead of switching
-branches.
-
-From the repo root:
-
-`git fetch --tags`
-
-Create a dedicated “live” folder you can edit freely:
-
-`git switch -c demo/live phase/00-init`
-
-If you already created `demo/live` before, use:
-
-`git switch demo/live`
-
-`git worktree add ..\sdd-health-plan-chat--live demo/live`
-
-Optional: create a “checkpoint view” folder that you never edit:
-
-`git worktree add --detach ..\sdd-health-plan-chat--00-init phase/00-init`
-
-### Rehearsal reset (start over quickly)
-
-To run the demo repeatedly, reset your **live** folder back to the start of init
-(this discards any edits in the live folder):
-
-`cd ..\sdd-health-plan-chat--live`
-
-`git reset --hard phase/00-init`
-
-`git clean -fd`
-
-Then rerun init:
-
-`specify init --here --script ps --ai copilot`
+If you're evolving the staged demo itself (including tag/checkpoint strategy), see MAINTAINERS.md.
 
 ## Init Phase (Phase 00)
 
@@ -171,6 +103,20 @@ Optional: if you want to create GitHub issues from tasks, run:
 ## Implement Phase (Phase 05)
 
 Goal: implement the feature by executing tasks in `specs/<feature-branch>/tasks.md`.
+
+### Start implementation: Phase 1 (Setup)
+
+1) Create a working branch for coding (recommended):
+
+`git switch -c impl/setup`
+
+2) Implement the Setup tasks (Phase 1) from `specs/001-health-plan-chat/tasks.md`:
+
+- T001–T007
+
+3) Check in your Setup implementation.
+
+If you're using tag-based checkpoints for demos, see MAINTAINERS.md.
 
 ### Pre-flight
 
