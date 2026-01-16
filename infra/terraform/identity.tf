@@ -5,6 +5,11 @@ resource "azuread_application" "github_actions" {
   display_name = "GitHub Actions - ${var.project_name}"
 
   owners = [data.azuread_client_config.current.object_id]
+
+  # Ignore owner changes - the SP can't modify its own application ownership
+  lifecycle {
+    ignore_changes = [owners]
+  }
 }
 
 # Create service principal for the application
@@ -12,6 +17,11 @@ resource "azuread_service_principal" "github_actions" {
   client_id = azuread_application.github_actions.client_id
 
   owners = [data.azuread_client_config.current.object_id]
+
+  # Ignore owner changes - the SP can't modify its own service principal ownership
+  lifecycle {
+    ignore_changes = [owners]
+  }
 }
 
 # Federated identity credential for main branch
