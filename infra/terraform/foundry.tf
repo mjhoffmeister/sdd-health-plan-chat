@@ -1,10 +1,12 @@
 # Azure AI Foundry / Azure AI Services for Health Plan Chat
 
 resource "azapi_resource" "ai_services" {
-  type      = "Microsoft.CognitiveServices/accounts@2024-10-01"
+  type      = "Microsoft.CognitiveServices/accounts@2025-09-01"
   name      = "aif-${local.resource_prefix}-${random_string.suffix.result}"
   location  = var.location
   parent_id = azapi_resource.resource_group.id
+
+  schema_validation_enabled = false  # allowProjectManagement not in schema yet
 
   identity {
     type = "SystemAssigned"
@@ -16,10 +18,11 @@ resource "azapi_resource" "ai_services" {
       name = "S0"
     }
     properties = {
-      customSubDomainName = "aif-${local.resource_prefix}-${random_string.suffix.result}"
-      publicNetworkAccess = "Enabled"
-      disableLocalAuth    = true  # Match current Azure state
-      apiProperties       = {}
+      customSubDomainName    = "aif-${local.resource_prefix}-${random_string.suffix.result}"
+      publicNetworkAccess    = "Enabled"
+      disableLocalAuth       = true  # Match current Azure state
+      allowProjectManagement = true  # Required for Foundry projects
+      apiProperties          = {}
     }
     tags = local.tags
   }

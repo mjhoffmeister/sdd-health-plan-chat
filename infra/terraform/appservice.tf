@@ -10,8 +10,8 @@ resource "azapi_resource" "app_service_plan" {
   body = {
     kind = "linux"
     sku = {
-      name = "B1"
-      tier = "Basic"
+      name = "F1"
+      tier = "Free"
     }
     properties = {
       reserved = true # Required for Linux
@@ -69,7 +69,7 @@ resource "azapi_resource" "app_service" {
           },
           {
             name  = "Foundry__ChatModelDeployment"
-            value = "gpt-4o-mini"
+            value = "gpt-5-mini"
           },
           {
             name  = "Foundry__EmbeddingModelDeployment"
