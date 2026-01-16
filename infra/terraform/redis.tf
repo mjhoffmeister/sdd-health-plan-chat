@@ -55,7 +55,7 @@ resource "azapi_resource" "redis_app_access" {
 
   body = {
     properties = {
-      accessPolicyName = "Data Owner"
+      accessPolicyName = "default"
       user = {
         objectId = azapi_resource.app_service.identity[0].principal_id
       }
