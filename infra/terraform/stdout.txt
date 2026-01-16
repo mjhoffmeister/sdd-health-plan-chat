@@ -1,0 +1,5 @@
+[0m[1mazapi_resource.search_service: Importing from ID "/subscriptions/c94297dc-12b3-40c7-a773-64846b40a34c/resourceGroups/rg-healthplanchat-demo/providers/Microsoft.Search/searchServices/srch-healthplanchat-demo-ylljo8"...[0m
+[0m[1mdata.azuread_client_config.current: Reading...[0m[0m
+[0m[1mdata.azuread_client_config.current: Read complete after 0s [id=0813a51f-4efd-4f96-bb41-7638192e3a7a-04b07795-8ddb-461a-bbee-02f9e1bf7b46-c2e7ad66-9103-433f-b0c2-76b427f29b9c][0m
+[0m[1mdata.azurerm_subscription.current: Reading...[0m[0m
+[0m[1mdata.azurerm_subscription.current: Read complete after 1s [id=/subscriptions/c94297dc-12b3-40c7-a773-64846b40a34c][0m

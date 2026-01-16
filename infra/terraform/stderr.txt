@@ -1,0 +1,21 @@
+[31m[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mFailed to retrieve resource[0m
+[31m│[0m [0m
+[31m│[0m [0m[0mreading Resource: (ResourceId
+[31m│[0m [0m"/subscriptions/c94297dc-12b3-40c7-a773-64846b40a34c/resourceGroups/rg-healthplanchat-demo/providers/Microsoft.Search/searchServices/srch-healthplanchat-demo-ylljo8"
+[31m│[0m [0m/ Api Version "2025-10-01-preview"): GET
+[31m│[0m [0mhttps://management.azure.com/subscriptions/c94297dc-12b3-40c7-a773-64846b40a34c/resourceGroups/rg-healthplanchat-demo/providers/Microsoft.Search/searchServices/srch-healthplanchat-demo-ylljo8
+[31m│[0m [0m--------------------------------------------------------------------------------
+[31m│[0m [0mRESPONSE 400: 400 Bad Request
+[31m│[0m [0mERROR CODE: NoRegisteredProviderFound
+[31m│[0m [0m--------------------------------------------------------------------------------
+[31m│[0m [0m{
+[31m│[0m [0m  "error": {
+[31m│[0m [0m    "code": "NoRegisteredProviderFound",
+[31m│[0m [0m    "message": "No registered resource provider found for location 'westus2' and API version '2025-10-01-preview' for type 'searchServices'. The supported api-versions are '2014-07-31-Preview, 2015-02-28, 2015-08-19, 2019-10-01-Preview, 2020-03-13, 2020-08-01, 2020-08-01-Preview, 2021-04-01-Preview, 2021-06-06-Preview, 2022-09-01, 2023-11-01, 2024-03-01-Preview, 2024-06-01-Preview, 2025-02-01-Preview, 2025-05-01'. The supported locations are 'germanynorth, qatarcentral, polandcentral, italynorth, israelcentral, spaincentral, newzealandnorth, jioindiacentral, malaysiawest, chilecentral, austriaeast, belgiumcentral, indonesiacentral, mexicocentral, southindia, swedencentral, ukwest, koreasouth, canadaeast, jioindiawest, westus3, germanywestcentral, norwayeast, switzerlandwest, switzerlandnorth, westus, westus2, eastus, eastus2, northeurope, westeurope, southeastasia, eastasia, northcentralus, southcentralus, centralus, japanwest, japaneast, koreacentral, australiaeast, australiasoutheast, brazilsouth, centralindia, westcentralus, canadacentral, uksouth, francecentral, southafricanorth, uaenorth'."
+[31m│[0m [0m  }
+[31m│[0m [0m}
+[31m│[0m [0m--------------------------------------------------------------------------------
+[31m│[0m [0m
+[31m╵[0m[0m
+[0m[0m
