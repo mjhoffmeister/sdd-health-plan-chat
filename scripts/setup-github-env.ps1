@@ -64,11 +64,16 @@ if (-not (Get-Command "gh" -ErrorAction SilentlyContinue)) {
 }
 Write-Host "  ✓ GitHub CLI found" -ForegroundColor Green
 
-# Check GH_TOKEN
-if (-not $env:GH_TOKEN) {
-    Write-Error "GH_TOKEN environment variable is not set. Set a PAT with admin:repo scope."
+# Check gh authentication (prefer GH_TOKEN, fall back to gh auth status)
+if ($env:GH_TOKEN) {
+    Write-Host "  ✓ GH_TOKEN is set" -ForegroundColor Green
+} else {
+    $authStatus = gh auth status 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Not authenticated with GitHub CLI. Run 'gh auth login' or set GH_TOKEN environment variable."
+    }
+    Write-Host "  ✓ GitHub CLI authenticated" -ForegroundColor Green
 }
-Write-Host "  ✓ GH_TOKEN is set" -ForegroundColor Green
 
 # Check Terraform
 if (-not (Get-Command "terraform" -ErrorAction SilentlyContinue)) {
