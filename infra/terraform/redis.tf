@@ -51,9 +51,11 @@ resource "azapi_resource" "redis_app_access" {
   name      = "appserviceaccess"
   parent_id = azapi_resource.redis_database.id
 
+  schema_validation_enabled = false
+
   body = {
     properties = {
-      accessPolicyName = "User"
+      accessPolicyName = "Data Owner"
       user = {
         objectId = azapi_resource.app_service.identity[0].principal_id
       }
