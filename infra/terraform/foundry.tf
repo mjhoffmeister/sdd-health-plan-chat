@@ -18,11 +18,32 @@ resource "azapi_resource" "ai_services" {
     properties = {
       customSubDomainName = "aif-${local.resource_prefix}-${random_string.suffix.result}"
       publicNetworkAccess = "Enabled"
-      disableLocalAuth    = false
+      disableLocalAuth    = true  # Match current Azure state
       apiProperties       = {}
     }
     tags = local.tags
   }
 
   response_export_values = ["properties.endpoint"]
+}
+
+# Foundry Project - required for model deployments, agents, playground
+resource "azapi_resource" "foundry_project" {
+  type      = "Microsoft.CognitiveServices/accounts/projects@2025-04-01-preview"
+  name      = "healthplanchat"
+  location  = var.location
+  parent_id = azapi_resource.ai_services.id
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  body = {
+    properties = {
+      description = "Health Plan Chat AI Project"
+    }
+    tags = local.tags
+  }
+
+  response_export_values = ["properties"]
 }

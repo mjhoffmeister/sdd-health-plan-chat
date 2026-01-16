@@ -1,5 +1,6 @@
 # Terraform Providers Configuration for Health Plan Chat
-# Uses AzAPI provider (pinned to 2.8.0) for Azure resources
+# Uses AzAPI provider (pinned to 2.7.0 due to identity bug in 2.8.0)
+# See: https://github.com/Azure/terraform-provider-azapi/issues/1027
 
 terraform {
   required_version = ">= 1.9.0"
@@ -7,7 +8,7 @@ terraform {
   required_providers {
     azapi = {
       source  = "Azure/azapi"
-      version = "2.8.0"
+      version = "2.7.0"
     }
     azurerm = {
       source  = "hashicorp/azurerm"

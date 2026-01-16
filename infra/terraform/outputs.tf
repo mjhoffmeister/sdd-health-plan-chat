@@ -12,7 +12,7 @@ output "app_service_url" {
 
 output "static_web_app_url" {
   description = "URL of the frontend Static Web App"
-  value       = jsondecode(azapi_resource.static_web_app.output).properties.defaultHostname
+  value       = "https://${azapi_resource.static_web_app.output.properties.defaultHostname}"
 }
 
 output "search_endpoint" {
@@ -27,13 +27,13 @@ output "storage_blob_endpoint" {
 
 output "redis_hostname" {
   description = "Azure Managed Redis hostname"
-  value       = jsondecode(azapi_resource.redis_enterprise.output).properties.hostName
+  value       = azapi_resource.redis_enterprise.output.properties.hostName
   sensitive   = true
 }
 
 output "foundry_endpoint" {
   description = "Azure AI Foundry endpoint"
-  value       = jsondecode(azapi_resource.ai_services.output).properties.endpoint
+  value       = azapi_resource.ai_services.output.properties.endpoint
 }
 
 # GitHub Actions WIF outputs
@@ -70,5 +70,5 @@ output "static_web_app_name" {
 
 output "static_web_app_hostname" {
   description = "Static Web App default hostname"
-  value       = jsondecode(azapi_resource.static_web_app.output).properties.defaultHostname
+  value       = azapi_resource.static_web_app.output.properties.defaultHostname
 }

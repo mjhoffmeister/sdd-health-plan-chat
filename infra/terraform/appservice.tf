@@ -10,9 +10,8 @@ resource "azapi_resource" "app_service_plan" {
   body = {
     kind = "linux"
     sku = {
-      name     = "B1"
-      tier     = "Basic"
-      capacity = 1
+      name = "B1"
+      tier = "Basic"
     }
     properties = {
       reserved = true # Required for Linux
@@ -39,7 +38,7 @@ resource "azapi_resource" "app_service" {
       httpsOnly    = true
       siteConfig = {
         linuxFxVersion = "DOTNETCORE|10.0"
-        alwaysOn       = true
+        alwaysOn       = false # Basic tier doesn't support alwaysOn
         http20Enabled  = true
         minTlsVersion  = "1.2"
         ftpsState      = "Disabled"
@@ -66,11 +65,11 @@ resource "azapi_resource" "app_service" {
           },
           {
             name  = "Foundry__Endpoint"
-            value = jsondecode(azapi_resource.ai_services.output).properties.endpoint
+            value = azapi_resource.ai_services.output.properties.endpoint
           },
           {
             name  = "Foundry__ChatModelDeployment"
-            value = "gpt-5-mini"
+            value = "gpt-4o-mini"
           },
           {
             name  = "Foundry__EmbeddingModelDeployment"

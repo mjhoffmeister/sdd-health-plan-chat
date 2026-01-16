@@ -2,7 +2,7 @@
 
 resource "azapi_resource" "storage_account" {
   type      = "Microsoft.Storage/storageAccounts@2023-05-01"
-  name      = "st${replace(local.resource_prefix, "-", "")}${random_string.suffix.result}"
+  name      = "sthpc${var.environment}${random_string.suffix.result}"
   location  = var.location
   parent_id = azapi_resource.resource_group.id
 

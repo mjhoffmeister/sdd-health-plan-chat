@@ -8,8 +8,8 @@ resource "azapi_resource" "static_web_app" {
 
   body = {
     sku = {
-      name = "Free"
-      tier = "Free"
+      name = "Standard"
+      tier = "Standard"
     }
     properties = {
       stagingEnvironmentPolicy     = "Enabled"

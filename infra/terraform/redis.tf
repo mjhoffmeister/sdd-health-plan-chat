@@ -8,8 +8,7 @@ resource "azapi_resource" "redis_enterprise" {
 
   body = {
     sku = {
-      name     = "Balanced_B0"
-      capacity = 2
+      name = "Balanced_B0"
     }
     properties = {
       minimumTlsVersion = "1.2"
