@@ -8,10 +8,14 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 // Configure HTTP client for API calls
-// In production, this will be configured to use the API base URL
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+// ApiBaseUrl from appsettings.json; falls back to host base address for local dev
+var apiBaseUrl = builder.Configuration["ApiBaseUrl"] ?? builder.HostEnvironment.BaseAddress;
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseUrl) });
 
 // Register API client
 builder.Services.AddScoped<ApiClient>();
+
+// Register chat session service
+builder.Services.AddScoped<ChatSessionService>();
 
 await builder.Build().RunAsync();

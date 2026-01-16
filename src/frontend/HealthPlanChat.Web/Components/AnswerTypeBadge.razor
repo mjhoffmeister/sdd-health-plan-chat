@@ -1,0 +1,19 @@
+@using HealthPlanChat.Web.Services
+
+<span class="answer-type-badge @(Type == AnswerType.Grounded ? "grounded" : "general-guidance")">
+    @if (Type == AnswerType.Grounded)
+    {
+        <span class="badge-icon">✓</span>
+        <span>Grounded</span>
+    }
+    else
+    {
+        <span class="badge-icon">ℹ</span>
+        <span>General Guidance</span>
+    }
+</span>
+
+@code {
+    [Parameter]
+    public AnswerType Type { get; set; }
+}

@@ -1,4 +1,5 @@
 # Azure Managed Redis (Redis Enterprise) for Health Plan Chat
+# Uses Microsoft Entra Authentication (managed identity) - no access keys required.
 
 resource "azapi_resource" "redis_enterprise" {
   type      = "Microsoft.Cache/redisEnterprise@2025-04-01"
@@ -36,12 +37,27 @@ resource "azapi_resource" "redis_database" {
         aofEnabled = false
         rdbEnabled = false
       }
+      accessKeysAuthentication = "Disabled"
     }
   }
 
   response_export_values = ["properties"]
 }
 
-# Note: Azure Managed Redis (Enterprise) uses access keys.
-# The connection string will be retrieved at runtime using managed identity
-# via Azure Resource Manager, or passed as a secret via App Settings.
+# Redis access assignment for App Service managed identity
+# Uses Microsoft Entra Authentication - Data Owner role grants full data access
+resource "azapi_resource" "redis_app_access" {
+  type      = "Microsoft.Cache/redisEnterprise/databases/accessPolicyAssignments@2025-04-01"
+  name      = "app-service-access"
+  parent_id = azapi_resource.redis_database.id
+
+  body = {
+    properties = {
+      accessPolicyName = "Data Owner"
+      objectId         = azapi_resource.app_service.identity[0].principal_id
+      objectIdAlias    = "AppService"
+    }
+  }
+
+  depends_on = [azapi_resource.app_service]
+}

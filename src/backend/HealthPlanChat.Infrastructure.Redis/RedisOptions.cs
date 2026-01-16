@@ -2,6 +2,7 @@ namespace HealthPlanChat.Infrastructure.Redis;
 
 /// <summary>
 /// Configuration options for Azure Managed Redis.
+/// Uses Microsoft Entra Authentication (managed identity) instead of access keys.
 /// </summary>
 public sealed class RedisOptions
 {
@@ -11,9 +12,10 @@ public sealed class RedisOptions
     public const string SectionKey = "Redis";
 
     /// <summary>
-    /// Redis connection string. Required.
+    /// Redis endpoint (hostname:port). Required.
+    /// Example: "myredis.eastus.redis.azure.net:10000"
     /// </summary>
-    public string ConnectionString { get; set; } = string.Empty;
+    public string Endpoint { get; set; } = string.Empty;
 
     /// <summary>
     /// Key prefix for session data. Default: "session:".

@@ -1,0 +1,26 @@
+@using HealthPlanChat.Web.Services
+
+<div class="references-list">
+    <h4>References</h4>
+    <ul>
+        @foreach (var reference in References)
+        {
+            <li class="reference-item">
+                <span class="reference-document">@reference.PlanDocumentId</span>
+                @if (!string.IsNullOrEmpty(reference.Anchor))
+                {
+                    <span class="reference-anchor">• @reference.Anchor</span>
+                }
+                @if (!string.IsNullOrEmpty(reference.Quote))
+                {
+                    <blockquote class="reference-quote">@reference.Quote</blockquote>
+                }
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    [Parameter]
+    public IReadOnlyList<Reference> References { get; set; } = [];
+}

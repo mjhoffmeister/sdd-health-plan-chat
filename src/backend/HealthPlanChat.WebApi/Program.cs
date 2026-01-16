@@ -1,6 +1,8 @@
 using HealthPlanChat.Bootstrapper;
 using HealthPlanChat.WebApi.Configuration;
+using HealthPlanChat.WebApi.Endpoints;
 using HealthPlanChat.WebApi.Middleware;
+using HealthPlanChat.WebApi.Presenters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,13 +16,37 @@ builder.Services.AddOpenApi();
 // Add health checks
 builder.Services.AddHealthChecks();
 
+// Add CORS for frontend (SWA) to call backend (App Service)
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+            ?? ["http://localhost:5000", "http://localhost:5001", "https://localhost:5001"];
+
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 // Add application services via Bootstrapper
 builder.Services.AddHealthPlanChatServices(builder.Configuration);
+
+// Register WebApi presenters
+builder.Services.AddScoped<CreateSessionPresenter>();
+builder.Services.AddScoped<ChatPresenter>();
+
+// Validate required configuration on startup
+ValidateConfiguration(builder.Configuration);
 
 var app = builder.Build();
 
 // Add structured logging first (to capture all requests)
 app.UseStructuredLogging();
+
+// Add request timing for /api/chat
+app.UseRequestTiming();
 
 // Add safe error handling
 app.UseSafeErrorHandling();
@@ -33,9 +59,72 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Enable CORS for frontend (SWA) to call backend (App Service)
+app.UseCors();
+
 // Health check endpoint
 app.MapHealthChecks("/healthz");
 
-// TODO: Map chat endpoints (Phase 3)
+// Map chat endpoints
+app.MapChatEndpoints();
 
 app.Run();
+
+/// <summary>
+/// Validates that required Azure configuration is present.
+/// </summary>
+static void ValidateConfiguration(IConfiguration configuration)
+{
+    var errors = new List<string>();
+
+    // Validate Redis configuration (uses managed identity, needs endpoint only)
+    var redisEndpoint = configuration["Redis:Endpoint"];
+    if (string.IsNullOrWhiteSpace(redisEndpoint))
+    {
+        errors.Add("Redis:Endpoint is required");
+    }
+
+    // Validate Search configuration
+    var searchEndpoint = configuration["Search:Endpoint"];
+    if (string.IsNullOrWhiteSpace(searchEndpoint))
+    {
+        errors.Add("Search:Endpoint is required");
+    }
+
+    var searchIndexName = configuration["Search:IndexName"];
+    if (string.IsNullOrWhiteSpace(searchIndexName))
+    {
+        errors.Add("Search:IndexName is required");
+    }
+
+    // Validate Foundry configuration
+    var foundryEndpoint = configuration["Foundry:Endpoint"];
+    if (string.IsNullOrWhiteSpace(foundryEndpoint))
+    {
+        errors.Add("Foundry:Endpoint is required");
+    }
+
+    var foundryModelDeployment = configuration["Foundry:ChatModelDeployment"];
+    if (string.IsNullOrWhiteSpace(foundryModelDeployment))
+    {
+        errors.Add("Foundry:ChatModelDeployment is required");
+    }
+
+    // In development, log warnings instead of throwing
+    if (errors.Count > 0)
+    {
+        var environment = configuration["ASPNETCORE_ENVIRONMENT"] ?? "Production";
+        if (environment.Equals("Development", StringComparison.OrdinalIgnoreCase))
+        {
+            foreach (var error in errors)
+            {
+                Console.WriteLine($"WARNING: {error}");
+            }
+        }
+        else
+        {
+            throw new InvalidOperationException(
+                $"Missing required configuration: {string.Join(", ", errors)}");
+        }
+    }
+}

@@ -80,21 +80,25 @@
 
 ### Implementation (US1)
 
-- [ ] T034 [US1] Define the single Chat use case contracts in `src/backend/HealthPlanChat.Core/UseCases/Chat/` (Request/Response/Boundary/Interactor)
-- [ ] T035 [US1] Extend `IChatSessionStore` contract in `src/backend/HealthPlanChat.Core/ExternalInterfaces/IChatSessionStore.cs` to support session creation + message history retrieval/append (so `/api/sessions` can be a thin endpoint)
-- [ ] T036 [US1] Implement `ChatInteractor` in `src/backend/HealthPlanChat.Core/UseCases/Chat/ChatInteractor.cs` (loads session history, retrieves materials, invokes `IChatAgent`, appends assistant message)
-- [ ] T037 [US1] Ensure `ChatInteractor` always returns explicit `answerType` + `references` (no separate chained use cases)
-- [ ] T038 [P] [US1] Add presenter for session creation in `src/backend/HealthPlanChat.WebApi/Presenters/CreateSessionPresenter.cs` (thin wrapper over `IChatSessionStore.CreateSession`)
-- [ ] T039 [P] [US1] Add presenter for chat responses in `src/backend/HealthPlanChat.WebApi/Presenters/ChatPresenter.cs`
-- [ ] T040 [US1] Map endpoints per OpenAPI in `src/backend/HealthPlanChat.WebApi/Endpoints/ChatEndpoints.cs` (`POST /api/sessions` uses session store directly, `POST /api/chat` calls `ChatInteractor`)
-- [ ] T041 [US1] Implement prompt construction (grounded answers + citations) in `src/backend/HealthPlanChat.Infrastructure.Prompting/PromptBuilder.cs`
-- [ ] T042 [US1] Wire Azure implementations behind interfaces in `src/backend/HealthPlanChat.Bootstrapper/ServiceCollectionExtensions.cs`
-- [ ] T043 [US1] Add minimal runtime configuration + health checks in `src/backend/HealthPlanChat.WebApi/Program.cs` (validate required Azure settings on startup; include `/healthz`)
-- [ ] T044 [P] [US1] Add safe request/response logging filters in `src/backend/HealthPlanChat.WebApi/Middleware/` to avoid logging prompt/user content
-- [ ] T045 [US1] Add "sync plan materials" workflow step in `.github/workflows/app.yml`: use `az storage blob sync` to upload only changed files from `data/plan-materials/*.json` to Blob (avoids redundant uploads; Search indexer auto-triggers on blob changes)
-- [ ] T046 [P] [US1] Implement minimal chat UI page in `src/frontend/HealthPlanChat.Web/Pages/Chat.razor`
-- [ ] T047 [P] [US1] Implement chat state + session initialization in `src/frontend/HealthPlanChat.Web/Services/ChatSessionService.cs`
-- [ ] T048 [P] [US1] Render grounded references in UI in `src/frontend/HealthPlanChat.Web/Components/ReferencesList.razor`
+- [X] T034 [US1] Define the single Chat use case contracts in `src/backend/HealthPlanChat.Core/UseCases/Chat/` (Request/Response/Boundary/Interactor)
+- [X] T035 [US1] Extend `IChatSessionStore` contract in `src/backend/HealthPlanChat.Core/ExternalInterfaces/IChatSessionStore.cs` to support session creation + message history retrieval/append (so `/api/sessions` can be a thin endpoint)
+- [X] T036 [US1] Implement `ChatInteractor` in `src/backend/HealthPlanChat.Core/UseCases/Chat/ChatInteractor.cs` (loads session history, retrieves materials, invokes `IChatAgent`, appends assistant message)
+- [X] T037 [US1] Ensure `ChatInteractor` always returns explicit `answerType` + `references` (no separate chained use cases)
+- [X] T038 [P] [US1] Add presenter for session creation in `src/backend/HealthPlanChat.WebApi/Presenters/CreateSessionPresenter.cs` (thin wrapper over `IChatSessionStore.CreateSession`)
+- [X] T039 [P] [US1] Add presenter for chat responses in `src/backend/HealthPlanChat.WebApi/Presenters/ChatPresenter.cs`
+- [X] T040 [US1] Map endpoints per OpenAPI in `src/backend/HealthPlanChat.WebApi/Endpoints/ChatEndpoints.cs` (`POST /api/sessions` uses session store directly, `POST /api/chat` calls `ChatInteractor`)
+- [X] T041 [US1] Implement prompt construction (grounded answers + citations) in `src/backend/HealthPlanChat.Infrastructure.Prompting/PromptBuilder.cs`
+- [X] T042 [US1] Wire Azure implementations behind interfaces in `src/backend/HealthPlanChat.Bootstrapper/ServiceCollectionExtensions.cs`
+- [X] T043 [US1] Add minimal runtime configuration + health checks in `src/backend/HealthPlanChat.WebApi/Program.cs` (validate required Azure settings on startup; include `/healthz`)
+- [X] T044 [P] [US1] Add safe request/response logging filters in `src/backend/HealthPlanChat.WebApi/Middleware/` to avoid logging prompt/user content
+- [X] T045 [US1] Add "sync plan materials" workflow step in `.github/workflows/app.yml`: use `az storage blob sync` to upload only changed files from `data/plan-materials/*.json` to Blob (avoids redundant uploads; Search indexer auto-triggers on blob changes)
+- [X] T046 [P] [US1] Implement minimal chat UI page in `src/frontend/HealthPlanChat.Web/Pages/Chat.razor`
+- [X] T047 [P] [US1] Implement chat state + session initialization in `src/frontend/HealthPlanChat.Web/Services/ChatSessionService.cs`
+- [X] T048 [P] [US1] Render grounded references in UI in `src/frontend/HealthPlanChat.Web/Components/ReferencesList.razor`
+- [X] T048a [US1] Add CORS configuration in `src/backend/HealthPlanChat.WebApi/Program.cs` (configurable allowed origins via `Cors:AllowedOrigins` for frontend-backend communication; required for SWA → App Service calls)
+- [X] T048b [US1] Add API base URL configuration in `src/frontend/HealthPlanChat.Web/` (use `appsettings.json` + environment-specific override for `ApiBaseUrl`; update `ApiClient.cs` and `Program.cs` to consume setting)
+- [X] T048c [US1] Add integration test validating Phase 3 independent test criteria in `src/backend/HealthPlanChat.Infrastructure.IntegrationTests/ChatEndpointsTests.cs` (POST /api/sessions → POST /api/chat returns answerType=Grounded with non-empty references using DI test doubles)
+- [X] T048d [US1] Update Redis to use Microsoft Entra Authentication (managed identity) instead of access keys: add App Service as Redis User in `infra/terraform/redis.tf`, update `RedisChatSessionStore.cs` to use `DefaultAzureCredential`, update `RedisOptions.cs` to use `Endpoint` instead of `ConnectionString`, add `Redis__Endpoint` to App Service settings in `infra/terraform/appservice.tf`
 
 **Checkpoint**: US1 works via API (and minimal UI) with grounded answers + references.
 

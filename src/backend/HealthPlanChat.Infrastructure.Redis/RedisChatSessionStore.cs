@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Azure.Identity;
 using HealthPlanChat.Core.Domain.Chat;
 using HealthPlanChat.Core.ExternalInterfaces;
 using Microsoft.Extensions.Logging;
@@ -10,13 +11,13 @@ namespace HealthPlanChat.Infrastructure.Redis;
 
 /// <summary>
 /// Redis-backed implementation of <see cref="IChatSessionStore"/>.
-/// Uses Azure Managed Redis (Redis Enterprise) for session storage with TTL.
+/// Uses Azure Managed Redis (Redis Enterprise) with Microsoft Entra Authentication.
 /// </summary>
 public sealed class RedisChatSessionStore : IChatSessionStore, IDisposable
 {
     private readonly ILogger<RedisChatSessionStore> _logger;
     private readonly RedisOptions _options;
-    private readonly Lazy<ConnectionMultiplexer> _connection;
+    private readonly Lazy<Task<ConnectionMultiplexer>> _connectionTask;
     private readonly TimeSpan _sessionTtl;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -33,14 +34,30 @@ public sealed class RedisChatSessionStore : IChatSessionStore, IDisposable
         _options = options.Value;
         _sessionTtl = TimeSpan.FromMinutes(60); // Default TTL
 
-        _connection = new Lazy<ConnectionMultiplexer>(() =>
-        {
-            _logger.LogInformation("Connecting to Redis...");
-            return ConnectionMultiplexer.Connect(_options.ConnectionString);
-        });
+        _connectionTask = new Lazy<Task<ConnectionMultiplexer>>(ConnectWithEntraAuthAsync);
     }
 
-    private IDatabase Database => _connection.Value.GetDatabase();
+    /// <summary>
+    /// Connects to Azure Managed Redis using Microsoft Entra Authentication (managed identity).
+    /// </summary>
+    private async Task<ConnectionMultiplexer> ConnectWithEntraAuthAsync()
+    {
+        _logger.LogInformation("Connecting to Redis with Entra authentication...");
+
+        var configOptions = await ConfigurationOptions.Parse(_options.Endpoint)
+            .ConfigureForAzureWithTokenCredentialAsync(new DefaultAzureCredential());
+
+        configOptions.AbortOnConnectFail = false;
+        configOptions.Ssl = true;
+
+        return await ConnectionMultiplexer.ConnectAsync(configOptions);
+    }
+
+    private async Task<IDatabase> GetDatabaseAsync()
+    {
+        var connection = await _connectionTask.Value;
+        return connection.GetDatabase();
+    }
 
     private string GetSessionKey(string sessionId) => $"{_options.KeyPrefix}{sessionId}";
     private string GetMessagesKey(string sessionId) => $"{_options.KeyPrefix}{sessionId}:messages";
@@ -60,7 +77,8 @@ public sealed class RedisChatSessionStore : IChatSessionStore, IDisposable
         };
 
         var json = JsonSerializer.Serialize(sessionData, JsonOptions);
-        await Database.StringSetAsync(sessionKey, json, _sessionTtl);
+        var db = await GetDatabaseAsync();
+        await db.StringSetAsync(sessionKey, json, _sessionTtl);
 
         _logger.LogInformation(
             "Created session. SessionId: {SessionId}",
@@ -75,7 +93,8 @@ public sealed class RedisChatSessionStore : IChatSessionStore, IDisposable
         ArgumentException.ThrowIfNullOrWhiteSpace(sessionId);
 
         var sessionKey = GetSessionKey(sessionId);
-        var json = await Database.StringGetAsync(sessionKey);
+        var db = await GetDatabaseAsync();
+        var json = await db.StringGetAsync(sessionKey);
 
         if (json.IsNullOrEmpty)
         {
@@ -111,12 +130,13 @@ public sealed class RedisChatSessionStore : IChatSessionStore, IDisposable
         var messagesKey = GetMessagesKey(sessionId);
         var messageJson = JsonSerializer.Serialize(new MessageData(message), JsonOptions);
 
-        await Database.ListRightPushAsync(messagesKey, messageJson);
-        await Database.KeyExpireAsync(messagesKey, _sessionTtl);
+        var db = await GetDatabaseAsync();
+        await db.ListRightPushAsync(messagesKey, messageJson);
+        await db.KeyExpireAsync(messagesKey, _sessionTtl);
 
         // Update session last updated time
         var sessionKey = GetSessionKey(sessionId);
-        var sessionJson = await Database.StringGetAsync(sessionKey);
+        var sessionJson = await db.StringGetAsync(sessionKey);
         if (!sessionJson.IsNullOrEmpty)
         {
             var sessionData = JsonSerializer.Deserialize<SessionData>(sessionJson.ToString(), JsonOptions);
@@ -124,7 +144,7 @@ public sealed class RedisChatSessionStore : IChatSessionStore, IDisposable
             {
                 sessionData.LastUpdatedAtUtc = DateTime.UtcNow;
                 var updatedJson = JsonSerializer.Serialize(sessionData, JsonOptions);
-                await Database.StringSetAsync(sessionKey, updatedJson, _sessionTtl);
+                await db.StringSetAsync(sessionKey, updatedJson, _sessionTtl);
             }
         }
 
@@ -140,7 +160,8 @@ public sealed class RedisChatSessionStore : IChatSessionStore, IDisposable
         ArgumentException.ThrowIfNullOrWhiteSpace(sessionId);
 
         var messagesKey = GetMessagesKey(sessionId);
-        var messageValues = await Database.ListRangeAsync(messagesKey, 0, -1);
+        var db = await GetDatabaseAsync();
+        var messageValues = await db.ListRangeAsync(messagesKey, 0, -1);
 
         var messages = new List<ChatMessage>();
         foreach (var value in messageValues)
@@ -160,9 +181,9 @@ public sealed class RedisChatSessionStore : IChatSessionStore, IDisposable
 
     public void Dispose()
     {
-        if (_connection.IsValueCreated)
+        if (_connectionTask.IsValueCreated && _connectionTask.Value.IsCompletedSuccessfully)
         {
-            _connection.Value.Dispose();
+            _connectionTask.Value.Result.Dispose();
         }
     }
 

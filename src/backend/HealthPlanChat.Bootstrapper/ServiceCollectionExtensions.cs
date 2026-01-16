@@ -1,10 +1,13 @@
 using HealthPlanChat.Core.ExternalInterfaces;
+using HealthPlanChat.Core.UseCases.Chat;
 using HealthPlanChat.Infrastructure.AgentFramework;
+using HealthPlanChat.Infrastructure.Prompting;
 using HealthPlanChat.Infrastructure.Redis;
 using HealthPlanChat.Infrastructure.Search;
 using HealthPlanChat.Infrastructure.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace HealthPlanChat.Bootstrapper;
 
@@ -34,6 +37,17 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IPlanMaterialSearch, AzureAiSearchPlanMaterialSearch>();
         services.AddSingleton<IChatAgent, AgentFrameworkChatAgent>();
         services.AddSingleton<PlanMaterialBlobPublisher>();
+        services.AddSingleton<PromptBuilder>();
+
+        // Register use case interactors
+        var topK = configuration.GetValue("Retrieval:TopK", 5);
+        services.AddScoped<IChatInputBoundary>(sp =>
+            new ChatInteractor(
+                sp.GetRequiredService<IChatSessionStore>(),
+                sp.GetRequiredService<IPlanMaterialSearch>(),
+                sp.GetRequiredService<IChatAgent>(),
+                sp.GetRequiredService<ILogger<ChatInteractor>>(),
+                topK));
 
         return services;
     }

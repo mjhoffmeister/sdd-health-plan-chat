@@ -1,0 +1,128 @@
+@page "/chat"
+@using HealthPlanChat.Web.Services
+@using HealthPlanChat.Web.Components
+@inject ChatSessionService ChatSession
+@implements IDisposable
+
+<PageTitle>Health Plan Chat</PageTitle>
+
+<div class="chat-container">
+    <header class="chat-header">
+        <h1>Health Plan Chat</h1>
+        <p class="subtitle">Ask questions about your health plan</p>
+    </header>
+
+    @if (!string.IsNullOrEmpty(ChatSession.Error))
+    {
+        <div class="error-banner">
+            <span class="error-icon">⚠️</span>
+            @ChatSession.Error
+        </div>
+    }
+
+    <div class="messages-container" @ref="_messagesContainer">
+        @if (!ChatSession.HasSession && !ChatSession.IsLoading)
+        {
+            <div class="welcome-message">
+                <h2>Welcome!</h2>
+                <p>Start a conversation by typing a question about your health plan below.</p>
+                <p class="hint">Examples:</p>
+                <ul>
+                    <li>"What is my deductible?"</li>
+                    <li>"Does my plan cover physical therapy?"</li>
+                    <li>"What are my copay amounts?"</li>
+                </ul>
+            </div>
+        }
+
+        @foreach (var message in ChatSession.Messages)
+        {
+            <div class="message @(message.Role == MessageRole.User ? "user" : "assistant")">
+                <div class="message-header">
+                    <span class="role">@(message.Role == MessageRole.User ? "You" : "Assistant")</span>
+                    @if (message.AnswerType.HasValue)
+                    {
+                        <AnswerTypeBadge Type="@message.AnswerType.Value" />
+                    }
+                    <span class="timestamp">@message.Timestamp.ToShortTimeString()</span>
+                </div>
+                <div class="message-content">
+                    @message.Text
+                </div>
+                @if (message.References.Count > 0)
+                {
+                    <ReferencesList References="@message.References" />
+                }
+            </div>
+        }
+
+        @if (ChatSession.IsLoading)
+        {
+            <div class="message assistant loading">
+                <div class="message-header">
+                    <span class="role">Assistant</span>
+                </div>
+                <div class="message-content">
+                    <span class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="input-container">
+        <form @onsubmit="HandleSubmit">
+            <input
+                type="text"
+                @bind="_inputMessage"
+                @bind:event="oninput"
+                placeholder="Type your question..."
+                disabled="@ChatSession.IsLoading"
+                class="message-input" />
+            <button type="submit" disabled="@(ChatSession.IsLoading || string.IsNullOrWhiteSpace(_inputMessage))" class="send-button">
+                Send
+            </button>
+        </form>
+    </div>
+</div>
+
+@code {
+    private string _inputMessage = string.Empty;
+    private ElementReference _messagesContainer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ChatSession.OnStateChanged += StateHasChanged;
+
+        // Initialize session if not already done
+        if (!ChatSession.HasSession)
+        {
+            await ChatSession.InitializeSessionAsync();
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (string.IsNullOrWhiteSpace(_inputMessage))
+            return;
+
+        var message = _inputMessage;
+        _inputMessage = string.Empty;
+
+        // Initialize session if needed
+        if (!ChatSession.HasSession)
+        {
+            await ChatSession.InitializeSessionAsync();
+        }
+
+        await ChatSession.SendMessageAsync(message);
+    }
+
+    public void Dispose()
+    {
+        ChatSession.OnStateChanged -= StateHasChanged;
+    }
+}

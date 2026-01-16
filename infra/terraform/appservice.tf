@@ -74,6 +74,10 @@ resource "azapi_resource" "app_service" {
           {
             name  = "Foundry__EmbeddingModelDeployment"
             value = "text-embedding-3-small"
+          },
+          {
+            name  = "Redis__Endpoint"
+            value = "${azapi_resource.redis_cluster.output.properties.hostName}:10000"
           }
         ]
       }
