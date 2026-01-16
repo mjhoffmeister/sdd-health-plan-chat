@@ -30,10 +30,10 @@ To keep semantics consistent with earlier phases (start-of-phase checkpoints), t
 Existing implement tag(s):
 
 - `phase/05-implement/01-setup` = start of implementation Phase 1 (Setup)
+- `phase/05-implement/02-foundational` = start of implementation Phase 2 (Foundational)
 
 Planned next tags (created as implementation progresses):
 
-- `phase/05-implement/02-foundational` = start of implementation Phase 2 (Foundational)
 - `phase/05-implement/03-us1` = start of implementation Phase 3 (US1)
 - `phase/05-implement/04-us2` = start of implementation Phase 4 (US2)
 - `phase/05-implement/05-us3` = start of implementation Phase 5 (US3)
