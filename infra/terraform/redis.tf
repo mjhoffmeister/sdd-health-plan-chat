@@ -48,12 +48,12 @@ resource "azapi_resource" "redis_database" {
 # Uses Microsoft Entra Authentication - Data Owner role grants full data access
 resource "azapi_resource" "redis_app_access" {
   type      = "Microsoft.Cache/redisEnterprise/databases/accessPolicyAssignments@2025-04-01"
-  name      = "app-service-access"
+  name      = "appserviceaccess"
   parent_id = azapi_resource.redis_database.id
 
   body = {
     properties = {
-      accessPolicyName = "Data Owner"
+      accessPolicyName = "User"
       user = {
         objectId = azapi_resource.app_service.identity[0].principal_id
       }
