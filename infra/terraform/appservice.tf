@@ -77,7 +77,7 @@ resource "azapi_resource" "app_service" {
           },
           {
             name  = "Redis__Endpoint"
-            value = "${azapi_resource.redis_cluster.output.properties.hostName}:10000"
+            value = "${azapi_resource.redis_enterprise.output.properties.hostName}:10000"
           }
         ]
       }
