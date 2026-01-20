@@ -100,6 +100,25 @@ resource "azapi_resource" "app_service" {
   response_export_values = ["properties.defaultHostName"]
 }
 
+# Disable App Service Authentication (EasyAuth) - API handles its own auth
+resource "azapi_resource" "app_service_auth" {
+  type      = "Microsoft.Web/sites/config@2024-04-01"
+  name      = "authsettingsV2"
+  parent_id = azapi_resource.app_service.id
+
+  body = {
+    properties = {
+      platform = {
+        enabled = false
+      }
+      globalValidation = {
+        requireAuthentication        = false
+        unauthenticatedClientAction = "AllowAnonymous"
+      }
+    }
+  }
+}
+
 # Role assignments for App Service managed identity
 
 # Search Index Data Reader
