@@ -78,6 +78,18 @@ resource "azapi_resource" "app_service" {
           {
             name  = "Redis__Endpoint"
             value = "${azapi_resource.redis_enterprise.output.properties.hostName}:10000"
+          },
+          {
+            name  = "Foundry__SearchConnectionId"
+            value = azapi_resource.foundry_search_connection.id
+          },
+          {
+            name  = "Foundry__SearchIndexName"
+            value = "plan-materials"
+          },
+          {
+            name  = "Cors__AllowedOrigins"
+            value = "https://${azapi_resource.static_web_app.output.properties.defaultHostname}"
           }
         ]
       }

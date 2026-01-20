@@ -1,0 +1,44 @@
+@using HealthPlanChat.Web.Services
+@inject ThemeService ThemeService
+@implements IDisposable
+
+<button class="theme-toggle" @onclick="ToggleTheme" title="@(_isDarkMode ? "Switch to light mode" : "Switch to dark mode")" aria-label="@(_isDarkMode ? "Switch to light mode" : "Switch to dark mode")">
+    @if (_isDarkMode)
+    {
+        <span class="theme-icon">☀️</span>
+        <span class="theme-label">Light</span>
+    }
+    else
+    {
+        <span class="theme-icon">🌙</span>
+        <span class="theme-label">Dark</span>
+    }
+</button>
+
+@code {
+    private bool _isDarkMode;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ThemeService.InitializeAsync();
+        _isDarkMode = ThemeService.IsDarkMode;
+        ThemeService.OnThemeChanged += HandleThemeChanged;
+    }
+
+    private async Task ToggleTheme()
+    {
+        await ThemeService.ToggleThemeAsync();
+        _isDarkMode = ThemeService.IsDarkMode;
+    }
+
+    private void HandleThemeChanged()
+    {
+        _isDarkMode = ThemeService.IsDarkMode;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        ThemeService.OnThemeChanged -= HandleThemeChanged;
+    }
+}

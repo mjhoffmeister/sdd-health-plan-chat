@@ -1,0 +1,17 @@
+@using HealthPlanChat.Web.Services
+@inject ChatSessionService ChatSession
+
+<button class="new-chat-button" @onclick="StartNewChat" disabled="@ChatSession.IsLoading" title="Start a new conversation">
+    <span class="new-chat-icon">💬</span>
+    <span class="new-chat-label">New Chat</span>
+</button>
+
+@code {
+    private async Task StartNewChat()
+    {
+        if (!ChatSession.IsLoading)
+        {
+            await ChatSession.NewChatAsync();
+        }
+    }
+}

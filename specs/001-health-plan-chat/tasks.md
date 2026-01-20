@@ -164,11 +164,11 @@
 
 ### Implementation (US3)
 
-- [ ] T055 [P] [US3] Add theme state service with persistence in `src/frontend/HealthPlanChat.Web/Services/ThemeService.cs`
-- [ ] T056 [P] [US3] Add theme toggle UI in `src/frontend/HealthPlanChat.Web/Components/ThemeToggle.razor`
-- [ ] T057 [P] [US3] Implement CSS variables/themes in `src/frontend/HealthPlanChat.Web/wwwroot/css/app.css`
-- [ ] T058 [US3] Ensure chat history remains intact across theme changes in `src/frontend/HealthPlanChat.Web/Pages/Chat.razor`
-- [ ] T059 [US3] Add “New chat” button that clears visible conversation in `src/frontend/HealthPlanChat.Web/Components/NewChatButton.razor`
+- [X] T055 [P] [US3] Add theme state service with persistence in `src/frontend/HealthPlanChat.Web/Services/ThemeService.cs`
+- [X] T056 [P] [US3] Add theme toggle UI in `src/frontend/HealthPlanChat.Web/Components/ThemeToggle.razor`
+- [X] T057 [P] [US3] Implement CSS variables/themes in `src/frontend/HealthPlanChat.Web/wwwroot/css/app.css`
+- [X] T058 [US3] Ensure chat history remains intact across theme changes in `src/frontend/HealthPlanChat.Web/Pages/Chat.razor`
+- [X] T059 [US3] Add "New chat" button that clears visible conversation in `src/frontend/HealthPlanChat.Web/Components/NewChatButton.razor`
 
 **Checkpoint**: US3 demo-ready UI with theme switching.
 
