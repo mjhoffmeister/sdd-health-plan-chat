@@ -1,9 +1,0 @@
-<step title="Incoming Request" date="2026-01-20T20:20:36.027" instance="870d61" url="/api/deployments/latest?deployer=OneDeploy&amp;time=2026-01-20_20-20-30Z" method="GET" type="request" pid="851,1,5" Host="app-healthplanchat-demo-ylljo8.scm.azurewebsites.net" User-Agent="GITHUBACTIONS_DeployWebAppToAzure_75d46bbdc7347623517356b189169187774527c6e5be16806a0aa12f905ac926" Authorization="Bea..." Content-Type="application/json; charset=utf-8" Cookie="ARRAffinity=870d616759e74713524da24210e88870fbcc76bc99b00f44c089fc8ca08f9724;Path=/;HttpOnly;Secure;Domain=app-healthplanchat-demo-ylljo8.scm.azurewebsites.net; ARRAffinitySameSite=870d616759e74713524da24210e88870fbcc76bc99b00f44c089fc8ca08f9724;Path=/;HttpOnly;SameSite=None;Secure;Domain=app-healthplanchat-demo-ylljo8.scm.azurewebsites.net" Content-Length="0" X-ARR-LOG-ID="4b418c98-c6f3-4d46-9fde-598bd055a5ef" CLIENT-IP="172.215.209.67:43033" X-SITE-DEPLOYMENT-ID="app-healthplanchat-demo-ylljo8" WAS-DEFAULT-HOSTNAME="app-healthplanchat-demo-ylljo8.scm.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/deployments/latest?deployer=OneDeploy&amp;time=2026-01-20_20-20-30Z" X-Client-IP="172.215.209.67" X-Client-Port="43033" >
-  <step title="Cleanup Xml Logs" date="2026-01-20T20:20:36.034" /><!-- duration: 14ms -->
-  <step title="DeploymentService.GetResult" date="2026-01-20T20:20:36.073" >
-    <step title="DeploymentService.GetLatestDeployment" date="2026-01-20T20:20:36.082" >
-      <step title="DeploymentManager.GetResults" date="2026-01-20T20:20:36.091" /><!-- duration: 393ms -->
-    </step><!-- duration: 469ms -->
-  </step><!-- duration: 484ms -->
-  <step title="Outgoing response" date="2026-01-20T20:20:36.573" type="response" statusCode="202" statusText="Accepted" /><!-- duration: 12ms -->
-</step><!-- duration: 566ms -->
