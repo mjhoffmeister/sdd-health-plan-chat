@@ -16,6 +16,8 @@ Current phase tags on `origin`:
 - `phase/03-plan` = start of plan
 - `phase/04-tasks` = start of tasks
 - `phase/05-implement/01-setup` = start of implement (Phase 1: Setup)
+- `phase/05-implement/02-foundational` = start of implement (Phase 2: Foundational)
+- `phase/05-implement/03-ask-plan-questions` = start of implement (Phase 3: Ask Plan Questions)
 
 ### Hierarchical tags ("folders")
 
@@ -32,13 +34,14 @@ Existing implement tag(s):
 - `phase/05-implement/01-setup` = start of implementation Phase 1 (Setup)
 - `phase/05-implement/02-foundational` = start of implementation Phase 2 (Foundational)
 - `phase/05-implement/03-ask-plan-questions` = start of implementation Phase 3 (Ask Plan Questions)
+- `phase/05-implement/04-handle-missing-answers` = start of implementation Phase 4 (Handle Missing Answers)
 
 Planned next tags (created as implementation progresses):
 
-- `phase/05-implement/04-us1` = start of implementation Phase 4 (US1)
-- `phase/05-implement/05-us2` = start of implementation Phase 5 (US2)
-- `phase/05-implement/06-us3` = start of implementation Phase 6 (US3)
-- `phase/05-implement/07-polish` = start of implementation Phase 7 (Polish)
+- `phase/05-implement/05-us1` = start of implementation Phase 5 (US1)
+- `phase/05-implement/06-us2` = start of implementation Phase 6 (US2)
+- `phase/05-implement/07-us3` = start of implementation Phase 7 (US3)
+- `phase/05-implement/08-polish` = start of implementation Phase 8 (Polish)
 
 Workflow rule: when you finish a phase and check in, tag the *start of the next phase* at that commit.
 
