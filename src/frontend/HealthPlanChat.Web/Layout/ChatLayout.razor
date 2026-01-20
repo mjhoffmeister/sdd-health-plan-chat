@@ -1,0 +1,20 @@
+@inherits LayoutComponentBase
+@using HealthPlanChat.Web.Services
+@inject ThemeService ThemeService
+@implements IDisposable
+
+<div class="chat-layout" data-theme="@ThemeService.CurrentTheme">
+    @Body
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        ThemeService.OnThemeChanged += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        ThemeService.OnThemeChanged -= StateHasChanged;
+    }
+}

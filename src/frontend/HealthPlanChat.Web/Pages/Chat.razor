@@ -1,15 +1,26 @@
 @page "/chat"
+@layout ChatLayout
 @using HealthPlanChat.Web.Services
 @using HealthPlanChat.Web.Components
+@using HealthPlanChat.Web.Layout
 @inject ChatSessionService ChatSession
+@inject ThemeService ThemeService
 @implements IDisposable
 
 <PageTitle>Health Plan Chat</PageTitle>
 
 <div class="chat-container">
     <header class="chat-header">
-        <h1>Health Plan Chat</h1>
-        <p class="subtitle">Ask questions about your health plan</p>
+        <div class="chat-header-actions">
+            <NewChatButton />
+        </div>
+        <div class="chat-header-content">
+            <h1>Health Plan Chat</h1>
+            <p class="subtitle">Ask questions about your health plan</p>
+        </div>
+        <div class="chat-header-actions">
+            <ThemeToggle />
+        </div>
     </header>
 
     @if (!string.IsNullOrEmpty(ChatSession.Error))
@@ -100,6 +111,10 @@
     protected override async Task OnInitializedAsync()
     {
         ChatSession.OnStateChanged += StateHasChanged;
+        ThemeService.OnThemeChanged += HandleThemeChanged;
+
+        // Initialize theme first (does not affect chat state)
+        await ThemeService.InitializeAsync();
 
         // Initialize session if not already done
         if (!ChatSession.HasSession)
@@ -125,8 +140,15 @@
         await ChatSession.SendMessageAsync(message);
     }
 
+    private void HandleThemeChanged()
+    {
+        // Theme change does not affect chat history - just trigger UI re-render
+        InvokeAsync(StateHasChanged);
+    }
+
     public void Dispose()
     {
         ChatSession.OnStateChanged -= StateHasChanged;
+        ThemeService.OnThemeChanged -= HandleThemeChanged;
     }
 }
