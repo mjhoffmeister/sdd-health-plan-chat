@@ -101,10 +101,10 @@ resource "azapi_resource" "app_service" {
 }
 
 # Disable App Service Authentication (EasyAuth) - API handles its own auth
-resource "azapi_resource" "app_service_auth" {
-  type      = "Microsoft.Web/sites/config@2024-04-01"
-  name      = "authsettingsV2"
-  parent_id = azapi_resource.app_service.id
+# Using azapi_update_resource because authsettingsV2 always exists on App Service
+resource "azapi_update_resource" "app_service_auth" {
+  type        = "Microsoft.Web/sites/config@2024-04-01"
+  resource_id = "${azapi_resource.app_service.id}/config/authsettingsV2"
 
   body = {
     properties = {
@@ -112,7 +112,7 @@ resource "azapi_resource" "app_service_auth" {
         enabled = false
       }
       globalValidation = {
-        requireAuthentication        = false
+        requireAuthentication       = false
         unauthenticatedClientAction = "AllowAnonymous"
       }
     }
