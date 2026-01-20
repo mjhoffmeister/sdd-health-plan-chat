@@ -119,13 +119,25 @@ jobs:
           app-name: ${{ vars.AZURE_APP_SERVICE_NAME }}
           package: ./publish/backend
 
-      - name: Deploy Frontend to Static Web Apps
+      - name: Get SWA Deployment Token
+        id: swa-token
         run: |
-          az staticwebapp deploy \
-            --app-name ${{ vars.AZURE_SWA_NAME }} \
+          TOKEN=$(az staticwebapp secrets list \
+            --name ${{ vars.AZURE_SWA_NAME }} \
             --resource-group ${{ vars.AZURE_RESOURCE_GROUP_NAME }} \
-            --source ./publish/frontend \
-            --no-build
+            --query "properties.apiKey" -o tsv)
+          echo "::add-mask::$TOKEN"
+          echo "token=$TOKEN" >> $GITHUB_OUTPUT
+
+      - name: Deploy Frontend to Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ steps.swa-token.outputs.token }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "./publish/frontend"
+          skip_app_build: true
+          skip_api_build: true
 
       - name: Sync Plan Materials to Blob Storage
         run: |
