@@ -44,8 +44,8 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore src/backend/HealthPlanChat.slnx
 
-      - name: Build backend
-        run: dotnet build ${{ env.BACKEND_PROJECT }} --configuration Release --no-restore
+      - name: Build solution
+        run: dotnet build src/backend/HealthPlanChat.slnx --configuration Release --no-restore
 
       - name: Run backend tests
         run: dotnet test src/backend/HealthPlanChat.slnx --configuration Release --no-build --verbosity normal
