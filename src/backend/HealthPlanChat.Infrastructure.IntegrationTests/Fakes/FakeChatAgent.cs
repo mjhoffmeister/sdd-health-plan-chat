@@ -1,44 +1,50 @@
 using HealthPlanChat.Core.Domain.Chat;
 using HealthPlanChat.Core.ExternalInterfaces;
-using HealthPlanChat.Core.UseCases.Contracts;
 
 namespace HealthPlanChat.Infrastructure.IntegrationTests.Fakes;
 
 /// <summary>
 /// Fake implementation of IChatAgent for testing.
-/// Implements deterministic behavior that mirrors real agent logic:
-/// - Returns Grounded with references when relevant chunks are provided
-/// - Returns GeneralGuidance with no references when no chunks are available
+/// Simulates agent-native search behavior:
+/// - Analyzes the user message to determine if it's in-scope
+/// - Returns Grounded with references for plan-related questions
+/// - Returns GeneralGuidance with no references for out-of-scope questions
 /// </summary>
 public sealed class FakeChatAgent : IChatAgent
 {
-    private const double MinScoreForGrounding = 0.5;
+    // Keywords that indicate plan-related questions (simulates search results)
+    private static readonly string[] PlanKeywords =
+    [
+        "deductible", "copay", "copayment", "coinsurance", "premium",
+        "coverage", "benefit", "network", "provider", "claim",
+        "prescription", "pharmacy", "emergency", "urgent care",
+        "out-of-pocket", "hmo", "ppo", "epo", "plan"
+    ];
 
     public Task<ChatAgentResponse> GenerateResponseAsync(
         IReadOnlyList<ChatMessage> history,
         string userMessage,
-        IReadOnlyList<RetrievedChunk> retrievedChunks,
         CancellationToken cancellationToken = default)
     {
-        // Determine if we have sufficient grounding material
-        var relevantChunks = retrievedChunks
-            .Where(c => c.Score >= MinScoreForGrounding)
-            .ToList();
+        // Simulate agent using search tool internally
+        // Check if the user's question relates to plan materials
+        var isInScope = PlanKeywords.Any(keyword =>
+            userMessage.Contains(keyword, StringComparison.OrdinalIgnoreCase));
 
-        if (relevantChunks.Count == 0)
+        if (!isInScope)
         {
-            // No relevant chunks - return general guidance
+            // No relevant search results - return general guidance
             return Task.FromResult(new ChatAgentResponse(
-                AnswerText: "I don't have specific information about that in your plan documents. " +
+                AnswerText: "**[GENERAL GUIDANCE]**\n\n" +
+                           "I don't have specific information about that in your plan documents. " +
                            "Please consult your plan materials or contact member services for accurate information.",
                 AnswerType: AnswerType.GeneralGuidance,
                 References: []));
         }
 
-        // Build grounded response from chunks
-        var topChunk = relevantChunks.First();
-        var answerText = BuildAnswerFromChunks(userMessage, relevantChunks);
-        var references = BuildReferences(relevantChunks);
+        // Build grounded response (simulates finding relevant plan documents)
+        var answerText = BuildGroundedAnswer(userMessage);
+        var references = BuildReferences(userMessage);
 
         return Task.FromResult(new ChatAgentResponse(
             AnswerText: answerText,
@@ -46,38 +52,62 @@ public sealed class FakeChatAgent : IChatAgent
             References: references));
     }
 
-    private static string BuildAnswerFromChunks(string question, List<RetrievedChunk> chunks)
+    private static string BuildGroundedAnswer(string question)
     {
-        var topChunk = chunks.First();
+        // Simulate LLM synthesizing an answer from search results
+        if (question.Contains("deductible", StringComparison.OrdinalIgnoreCase))
+        {
+            return "**[GROUNDED]**\n\n" +
+                   "Based on your Contoso PPO Silver 2026 plan, your annual deductible is $2,000 for individual coverage " +
+                   "and $4,000 for family coverage. The deductible applies to most covered services except for " +
+                   "preventive care, which is covered at 100% before the deductible. [Source: Contoso PPO Silver 2026]";
+        }
 
-        // Simulate an LLM synthesizing an answer from chunks
-        // In reality, the LLM would paraphrase; here we just confirm we're using the content
-        return $"Based on your {topChunk.PlanName}, here's what I found: {topChunk.Text}";
+        if (question.Contains("copay", StringComparison.OrdinalIgnoreCase))
+        {
+            return "**[GROUNDED]**\n\n" +
+                   "Your copay amounts depend on the type of service. For primary care visits, your copay is $25. " +
+                   "Specialist visits have a $50 copay. Emergency room visits have a $250 copay, which is waived " +
+                   "if you're admitted. [Source: Contoso PPO Silver 2026]";
+        }
+
+        // Generic plan-related answer
+        return "**[GROUNDED]**\n\n" +
+               "Based on your plan documents, I found relevant information about your coverage. " +
+               "Your plan provides comprehensive benefits including medical, prescription drug, and " +
+               "preventive care coverage. [Source: Contoso PPO Silver 2026]";
     }
 
-    private static IReadOnlyList<Reference> BuildReferences(List<RetrievedChunk> chunks)
+    private static IReadOnlyList<Reference> BuildReferences(string question)
     {
-        // Create references from the chunks used for grounding
-        return chunks
-            .Select(chunk => new Reference(
-                PlanDocumentId: chunk.PlanDocumentId,
-                Anchor: chunk.PageOrAnchor,
-                Quote: TruncateQuote(chunk.Text)))
-            .ToList();
-    }
+        // Simulate citations extracted from agent response annotations
+        var references = new List<Reference>();
 
-    private static string TruncateQuote(string text)
-    {
-        // Truncate quote to reasonable length (like a real citation)
-        const int maxLength = 100;
-        if (text.Length <= maxLength)
-            return text;
+        if (question.Contains("deductible", StringComparison.OrdinalIgnoreCase))
+        {
+            references.Add(new Reference(
+                PlanDocumentId: "contoso-ppo-silver-2026",
+                Anchor: "Cost Sharing",
+                Quote: "Annual deductible: $2,000 individual / $4,000 family..."));
+        }
 
-        var truncated = text[..maxLength];
-        var lastSpace = truncated.LastIndexOf(' ');
-        if (lastSpace > 50)
-            truncated = truncated[..lastSpace];
+        if (question.Contains("copay", StringComparison.OrdinalIgnoreCase))
+        {
+            references.Add(new Reference(
+                PlanDocumentId: "contoso-ppo-silver-2026",
+                Anchor: "Copayments",
+                Quote: "Primary care: $25, Specialist: $50, Emergency: $250..."));
+        }
 
-        return truncated + "...";
+        // Always include at least one reference for grounded answers
+        if (references.Count == 0)
+        {
+            references.Add(new Reference(
+                PlanDocumentId: "contoso-ppo-silver-2026",
+                Anchor: "Summary of Benefits",
+                Quote: "This plan provides comprehensive medical coverage..."));
+        }
+
+        return references;
     }
 }

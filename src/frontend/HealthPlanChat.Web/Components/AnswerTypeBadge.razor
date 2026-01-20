@@ -1,10 +1,11 @@
 @using HealthPlanChat.Web.Services
 
-<span class="answer-type-badge @(Type == AnswerType.Grounded ? "grounded" : "general-guidance")">
+<span class="answer-type-badge @(Type == AnswerType.Grounded ? "grounded" : "general-guidance")"
+      title="@GetTooltip()">
     @if (Type == AnswerType.Grounded)
     {
         <span class="badge-icon">✓</span>
-        <span>Grounded</span>
+        <span>Grounded in Plan Materials</span>
     }
     else
     {
@@ -16,4 +17,11 @@
 @code {
     [Parameter]
     public AnswerType Type { get; set; }
+
+    private string GetTooltip()
+    {
+        return Type == AnswerType.Grounded
+            ? "This answer is based on information found in your health plan documents."
+            : "This answer is general guidance. Specific information was not found in your plan documents.";
+    }
 }

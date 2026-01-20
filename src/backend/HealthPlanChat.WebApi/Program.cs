@@ -1,4 +1,6 @@
 using HealthPlanChat.Bootstrapper;
+using HealthPlanChat.Core.UseCases;
+using HealthPlanChat.Core.UseCases.Chat;
 using HealthPlanChat.WebApi.Configuration;
 using HealthPlanChat.WebApi.Endpoints;
 using HealthPlanChat.WebApi.Middleware;
@@ -30,12 +32,13 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add application services via Bootstrapper
-builder.Services.AddHealthPlanChatServices(builder.Configuration);
+// Add core services via Bootstrapper (infrastructure + domain services)
+builder.Services.AddHealthPlanChatCoreServices(builder.Configuration);
 
-// Register WebApi presenters
-builder.Services.AddScoped<CreateSessionPresenter>();
-builder.Services.AddScoped<ChatPresenter>();
+// Register presentation-layer services (boundaries + presenters)
+// Chat use case: boundary produces IResult, interactor uses boundary for outcomes
+builder.Services.AddScoped<IChatBoundary<IResult>, ChatPresenter>();
+builder.Services.AddScoped<IUseCaseInteractor<ChatRequest, IResult>, ChatInteractor<IResult>>();
 
 // Validate required configuration on startup
 ValidateConfiguration(builder.Configuration);

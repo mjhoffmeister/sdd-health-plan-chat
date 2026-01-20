@@ -1,6 +1,5 @@
 using HealthPlanChat.Core.Domain.Chat;
 using HealthPlanChat.Core.ExternalInterfaces;
-using HealthPlanChat.Core.UseCases.Contracts;
 using Microsoft.Extensions.Logging;
 
 namespace HealthPlanChat.Core.UseCases.Chat;
@@ -8,102 +7,113 @@ namespace HealthPlanChat.Core.UseCases.Chat;
 /// <summary>
 /// Interactor that orchestrates the chat use case:
 /// 1. Validates input
-/// 2. Loads session history
-/// 3. Stores user message
-/// 4. Retrieves relevant plan materials
-/// 5. Invokes the chat agent
+/// 2. Creates or loads session
+/// 3. Gets message history
+/// 4. Stores user message
+/// 5. Invokes the chat agent (agent handles retrieval internally via Azure AI Search tool)
 /// 6. Stores assistant response
-/// 7. Returns the output with explicit answerType and references
+/// 7. Calls boundary method with outcome
 /// </summary>
-public sealed class ChatInteractor : IChatInputBoundary
+/// <typeparam name="TOutput">The output type determined by the boundary.</typeparam>
+public sealed class ChatInteractor<TOutput> : IUseCaseInteractor<ChatRequest, TOutput>
 {
     private readonly IChatSessionStore _sessionStore;
-    private readonly IPlanMaterialSearch _planMaterialSearch;
     private readonly IChatAgent _chatAgent;
-    private readonly ILogger<ChatInteractor> _logger;
-    private readonly int _topK;
+    private readonly IChatBoundary<TOutput> _boundary;
+    private readonly ILogger<ChatInteractor<TOutput>> _logger;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ChatInteractor"/> class.
+    /// Initializes a new instance of the <see cref="ChatInteractor{TOutput}"/> class.
     /// </summary>
     /// <param name="sessionStore">The session store.</param>
-    /// <param name="planMaterialSearch">The plan material search.</param>
-    /// <param name="chatAgent">The chat agent.</param>
+    /// <param name="chatAgent">The chat agent (handles retrieval internally).</param>
+    /// <param name="boundary">The output boundary.</param>
     /// <param name="logger">The logger.</param>
-    /// <param name="topK">Maximum number of chunks to retrieve. Default: 5.</param>
     public ChatInteractor(
         IChatSessionStore sessionStore,
-        IPlanMaterialSearch planMaterialSearch,
         IChatAgent chatAgent,
-        ILogger<ChatInteractor> logger,
-        int topK = 5)
+        IChatBoundary<TOutput> boundary,
+        ILogger<ChatInteractor<TOutput>> logger)
     {
         _sessionStore = sessionStore ?? throw new ArgumentNullException(nameof(sessionStore));
-        _planMaterialSearch = planMaterialSearch ?? throw new ArgumentNullException(nameof(planMaterialSearch));
         _chatAgent = chatAgent ?? throw new ArgumentNullException(nameof(chatAgent));
+        _boundary = boundary ?? throw new ArgumentNullException(nameof(boundary));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _topK = topK;
     }
 
     /// <inheritdoc />
-    public async Task<ChatOutput> ExecuteAsync(ChatInput input, CancellationToken cancellationToken = default)
+    public async Task<TOutput> HandleAsync(ChatRequest request, CancellationToken cancellationToken = default)
     {
         // 1. Validate input
-        input.Validate();
-
-        _logger.LogInformation(
-            "Processing chat request. SessionId: {SessionId}",
-            input.SessionId);
-
-        // 2. Load session to verify it exists
-        var session = await _sessionStore.GetSessionAsync(input.SessionId, cancellationToken);
-        if (session is null)
+        if (string.IsNullOrWhiteSpace(request.UserMessage))
         {
-            _logger.LogWarning("Session not found. SessionId: {SessionId}", input.SessionId);
-            throw new InvalidOperationException($"Session not found: {input.SessionId}");
+            return _boundary.ValidationFailed("Message is required.");
         }
 
-        // 3. Get message history
-        var history = await _sessionStore.GetMessagesAsync(input.SessionId, cancellationToken);
+        // 2. Create or load session
+        string sessionId;
+        IReadOnlyList<ChatMessage> history;
 
-        // 4. Store user message
-        var userMessage = ChatMessage.CreateUserMessage(input.SessionId, input.UserMessage);
-        await _sessionStore.AppendMessageAsync(input.SessionId, userMessage, cancellationToken);
+        if (string.IsNullOrWhiteSpace(request.SessionId))
+        {
+            // Create new session
+            var session = await _sessionStore.CreateSessionAsync(cancellationToken);
+            sessionId = session.ChatSessionId;
+            history = [];
 
-        // 5. Retrieve relevant plan materials
-        var retrievedChunks = await _planMaterialSearch.SearchAsync(
-            input.UserMessage,
-            _topK,
-            cancellationToken);
+            _logger.LogInformation(
+                "Created new session. SessionId: {SessionId}",
+                sessionId);
+        }
+        else
+        {
+            // Load existing session
+            sessionId = request.SessionId;
+            var session = await _sessionStore.GetSessionAsync(sessionId, cancellationToken);
 
-        _logger.LogInformation(
-            "Retrieved {ChunkCount} chunks for grounding. SessionId: {SessionId}",
-            retrievedChunks.Count,
-            input.SessionId);
+            if (session is null)
+            {
+                _logger.LogWarning("Session not found. SessionId: {SessionId}", sessionId);
+                return _boundary.SessionNotFound(sessionId);
+            }
 
-        // 6. Invoke chat agent
+            history = await _sessionStore.GetMessagesAsync(sessionId, cancellationToken);
+
+            _logger.LogInformation(
+                "Loaded existing session. SessionId: {SessionId}, MessageCount: {MessageCount}",
+                sessionId,
+                history.Count);
+        }
+
+        // 3. Store user message
+        var userMessage = ChatMessage.CreateUserMessage(sessionId, request.UserMessage);
+        await _sessionStore.AppendMessageAsync(sessionId, userMessage, cancellationToken);
+
+        // 4. Invoke chat agent (agent handles retrieval internally via Azure AI Search tool)
         var agentResponse = await _chatAgent.GenerateResponseAsync(
             history,
-            input.UserMessage,
-            retrievedChunks,
+            request.UserMessage,
             cancellationToken);
 
-        // 7. Store assistant response
+        // 5. Store assistant response
         var assistantMessage = ChatMessage.CreateAssistantMessage(
-            input.SessionId,
+            sessionId,
             agentResponse.AnswerText);
-        await _sessionStore.AppendMessageAsync(input.SessionId, assistantMessage, cancellationToken);
+        await _sessionStore.AppendMessageAsync(sessionId, assistantMessage, cancellationToken);
 
         _logger.LogInformation(
             "Chat completed. SessionId: {SessionId}, AnswerType: {AnswerType}, ReferenceCount: {ReferenceCount}",
-            input.SessionId,
+            sessionId,
             agentResponse.AnswerType,
             agentResponse.References.Count);
 
-        // 8. Return output with explicit answerType and references
-        return new ChatOutput(
+        // 6. Return output via boundary
+        var response = new ChatResponse(
+            sessionId,
             agentResponse.AnswerText,
             agentResponse.AnswerType,
             agentResponse.References);
+
+        return _boundary.ChatCompleted(response);
     }
 }

@@ -1,40 +1,46 @@
 using HealthPlanChat.Core.UseCases.Chat;
-using HealthPlanChat.Core.UseCases.Contracts;
+using ApiChatResponse = HealthPlanChat.WebApi.Contracts.ChatResponse;
+using CoreChatResponse = HealthPlanChat.Core.UseCases.Chat.ChatResponse;
 
 namespace HealthPlanChat.WebApi.Presenters;
 
 /// <summary>
-/// Presenter for chat responses. Transforms use case output to API response.
+/// Presenter for chat responses. Implements the boundary interface to transform
+/// use case outcomes into API responses (IResult).
 /// </summary>
-public sealed class ChatPresenter
+public sealed class ChatPresenter : IChatBoundary<IResult>
 {
-    private readonly IChatInputBoundary _chatInteractor;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ChatPresenter"/> class.
-    /// </summary>
-    /// <param name="chatInteractor">The chat interactor.</param>
-    public ChatPresenter(IChatInputBoundary chatInteractor)
+    /// <inheritdoc />
+    public IResult ChatCompleted(CoreChatResponse response)
     {
-        _chatInteractor = chatInteractor ?? throw new ArgumentNullException(nameof(chatInteractor));
+        var apiResponse = new ApiChatResponse(
+            response.SessionId,
+            response.AnswerType,
+            response.AnswerText,
+            response.References);
+
+        return Results.Ok(apiResponse);
     }
 
-    /// <summary>
-    /// Processes a chat message and returns the response.
-    /// </summary>
-    /// <param name="request">The chat request.</param>
-    /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>The chat response.</returns>
-    public async Task<ChatResponse> ProcessChatAsync(
-        ChatRequest request,
-        CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public IResult SessionNotFound(string sessionId)
     {
-        var input = new ChatInput(request.SessionId, request.Message);
-        var output = await _chatInteractor.ExecuteAsync(input, cancellationToken);
+        return Results.NotFound(new
+        {
+            Title = "Not Found",
+            Detail = "The specified session was not found or has expired.",
+            Status = StatusCodes.Status404NotFound
+        });
+    }
 
-        return new ChatResponse(
-            output.AnswerType,
-            output.AnswerText,
-            output.References);
+    /// <inheritdoc />
+    public IResult ValidationFailed(string errorMessage)
+    {
+        return Results.BadRequest(new
+        {
+            Title = "Bad Request",
+            Detail = errorMessage,
+            Status = StatusCodes.Status400BadRequest
+        });
     }
 }

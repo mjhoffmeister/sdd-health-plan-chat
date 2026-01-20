@@ -112,14 +112,47 @@
 
 ### Implementation (US2)
 
-- [ ] T049 [P] [US2] Add retrieval confidence/threshold policy in `src/backend/HealthPlanChat.Core/Domain/Retrieval/RetrievalPolicy.cs` (define confidence as: has at least `MinHits` AND top AI Search score >= `MinTopScore`; defaults + config keys documented, e.g., `Retrieval__MinHits`, `Retrieval__MinTopScore`)
-- [ ] T050 [US2] Update `ChatInteractor` to apply `RetrievalPolicy` and produce `answerType=GeneralGuidance` when retrieval confidence is below threshold in `src/backend/HealthPlanChat.Core/UseCases/Chat/ChatInteractor.cs`
-- [ ] T051 [US2] Update prompting to force explicit labeling for all responses in `src/backend/HealthPlanChat.Infrastructure.Prompting/PromptBuilder.cs`
-- [ ] T052 [US2] Ensure API response always returns `answerType` and `references` in `src/backend/HealthPlanChat.WebApi/Presenters/ChatPresenter.cs`
-- [ ] T053 [P] [US2] Update UI to show answer type badge in `src/frontend/HealthPlanChat.Web/Components/AnswerTypeBadge.razor`
-- [ ] T054 [P] [US2] Add UX copy for “general guidance” disclaimer in `src/frontend/HealthPlanChat.Web/Components/AnswerDisclaimer.razor`
+- [X] T049 [P] [US2] Add retrieval confidence/threshold policy in `src/backend/HealthPlanChat.Core/Domain/Retrieval/RetrievalPolicy.cs` (define confidence as: has at least `MinHits` AND top AI Search score >= `MinTopScore`; defaults + config keys documented, e.g., `Retrieval__MinHits`, `Retrieval__MinTopScore`)
+- [X] T050 [US2] Update `ChatInteractor` to apply `RetrievalPolicy` and produce `answerType=GeneralGuidance` when retrieval confidence is below threshold in `src/backend/HealthPlanChat.Core/UseCases/Chat/ChatInteractor.cs`
+- [X] T051 [US2] Update prompting to force explicit labeling for all responses in `src/backend/HealthPlanChat.Infrastructure.Prompting/PromptBuilder.cs`
+- [X] T052 [US2] Ensure API response always returns `answerType` and `references` in `src/backend/HealthPlanChat.WebApi/Presenters/ChatPresenter.cs`
+- [X] T053 [P] [US2] Update UI to show answer type badge in `src/frontend/HealthPlanChat.Web/Components/AnswerTypeBadge.razor`
+- [X] T054 [P] [US2] Add UX copy for "general guidance" disclaimer in `src/frontend/HealthPlanChat.Web/Components/AnswerDisclaimer.razor`
 
 **Checkpoint**: US2 behavior is reliable and non-misleading.
+
+---
+
+## Patch: Agent-Native RAG Refactor
+
+**Purpose**: Refactor retrieval from manual (ChatInteractor queries AI Search) to agent-native (Agent Framework uses `AzureAISearchAgentTool` internally). This aligns with Agent Framework best practices where the agent handles retrieval as a tool, not the application.
+
+**Why now**: The current architecture manually queries Azure AI Search in `ChatInteractor` and passes chunks to the agent. The Agent Framework pattern is for the agent to use built-in tools (like `AzureAISearchAgentTool`) to handle retrieval autonomously. Fixing this now avoids carrying incorrect architecture into remaining phases.
+
+**Reference**: [Azure AI Search tool for agents](https://learn.microsoft.com/en-us/azure/ai-foundry/agents/how-to/tools/ai-search)
+
+### Infrastructure
+
+- [X] T067 [P] Create Foundry-to-AI-Search connection via Terraform in `infra/terraform/foundry.tf` (add connection resource linking Foundry project to Search service; output `search_connection_id` for agent configuration)
+- [X] T068 [P] Add `Azure.AI.Projects.OpenAI` package to `src/backend/Directory.Packages.props` for `AzureAISearchAgentTool` and `AIProjectClient` support (pin version per NuGet policy)
+
+### Backend Refactor
+
+- [X] T069 Update `FoundryOptions.cs` to include `SearchConnectionId` and `SearchIndexName` configuration in `src/backend/HealthPlanChat.Infrastructure.AgentFramework/FoundryOptions.cs`
+- [X] T070 Refactor `AgentFrameworkChatAgent.cs` to use `AzureAISearchAgentTool` with configured index connection; agent handles retrieval internally in `src/backend/HealthPlanChat.Infrastructure.AgentFramework/AgentFrameworkChatAgent.cs`
+- [X] T071 Update `IChatAgent` interface to remove `retrievedChunks` parameter (agent handles retrieval internally) in `src/backend/HealthPlanChat.Core/ExternalInterfaces/IChatAgent.cs`
+- [X] T072 Simplify `ChatInteractor` to remove `IPlanMaterialSearch` dependency and manual retrieval logic in `src/backend/HealthPlanChat.Core/UseCases/Chat/ChatInteractor.cs`
+- [X] T073 Parse `UriCitationMessageAnnotation` from agent response to extract references (title, URL) in `src/backend/HealthPlanChat.Infrastructure.AgentFramework/AgentFrameworkChatAgent.cs`
+- [X] T074 Move Grounded vs GeneralGuidance decision to agent prompt instructions (agent decides based on search results quality) in `src/backend/HealthPlanChat.Infrastructure.Prompting/PromptBuilder.cs`
+- [X] T075 Update `ServiceCollectionExtensions.cs` DI wiring to remove `IPlanMaterialSearch` from `ChatInteractor` and configure agent with search tool in `src/backend/HealthPlanChat.Bootstrapper/ServiceCollectionExtensions.cs`
+
+### Cleanup
+
+- [X] T076 [P] Update integration tests to reflect new architecture (agent-native search, no manual chunk passing) in `src/backend/HealthPlanChat.Infrastructure.IntegrationTests/ChatEndpointsTests.cs`
+- [X] T077 [P] Deprecate `RetrievalPolicy.cs` and related confidence threshold logic (agent handles grounding decisions) in `src/backend/HealthPlanChat.Core/Domain/Retrieval/`
+- [X] T078 [P] Evaluate `HealthPlanChat.Infrastructure.Search` project — keep for index maintenance utilities or remove if fully replaced by agent tool
+
+**Checkpoint**: Agent handles retrieval natively via `AzureAISearchAgentTool`. `ChatInteractor` no longer queries search directly. Existing US1/US2 tests still pass (answerType + references work as before).
 
 ---
 
@@ -161,18 +194,21 @@
 
 - **Setup (Phase 1)**: No dependencies
 - **Foundational (Phase 2)**: Depends on Setup; blocks all user stories
-- **User Stories (Phase 3+)**: Depend on Foundational
+- **User Stories (Phase 3-4)**: Depend on Foundational
+- **Patch (Agent-Native RAG)**: Depends on Phase 4; should be done before Phase 5
+- **User Story 3 (Phase 5)**: Depends on Foundational; primarily frontend (can start after Patch)
 - **Polish (Phase 6)**: Depends on at least US1 (and is typically done after the app is runnable)
 
 ### User Story Dependencies
 
 - **US1 (P1)**: Starts after Foundational
 - **US2 (P2)**: Starts after Foundational; builds on the same `/api/chat` flow
-- **US3 (P3)**: Starts after Foundational; primarily frontend
+- **Patch**: Starts after US2; refactors agent integration before further feature work
+- **US3 (P3)**: Starts after Patch; primarily frontend
 
 ### Suggested Completion Graph
 
-- Setup (Phase 1) → Foundational (Phase 2) → US1 (Phase 3) → US2 (Phase 4) → US3 (Phase 5) → Polish (Phase 6)
+- Setup (Phase 1) → Foundational (Phase 2) → US1 (Phase 3) → US2 (Phase 4) → **Patch** → US3 (Phase 5) → Polish (Phase 6)
 
 ### Parallel Opportunities
 

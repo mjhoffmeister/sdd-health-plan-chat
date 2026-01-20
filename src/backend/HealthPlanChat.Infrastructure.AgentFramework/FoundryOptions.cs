@@ -34,4 +34,21 @@ public sealed class FoundryOptions
     /// Temperature for chat completion. Default: 0.7.
     /// </summary>
     public double Temperature { get; set; } = 0.7;
+
+    /// <summary>
+    /// Connection ID linking Foundry project to Azure AI Search.
+    /// Format: /subscriptions/{sub}/resourceGroups/{rg}/providers/Microsoft.CognitiveServices/accounts/{account}/projects/{project}/connections/{connection}
+    /// Required for AzureAISearchAgentTool.
+    /// </summary>
+    public string SearchConnectionId { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Azure AI Search index name for plan materials. Default: "plan-materials".
+    /// </summary>
+    public string SearchIndexName { get; set; } = "plan-materials";
+
+    /// <summary>
+    /// Maximum number of search results to retrieve. Default: 5.
+    /// </summary>
+    public int SearchTopK { get; set; } = 5;
 }

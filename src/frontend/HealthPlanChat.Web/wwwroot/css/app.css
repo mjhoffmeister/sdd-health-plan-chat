@@ -391,3 +391,42 @@ code {
     font-style: italic;
     color: #4b5563;
 }
+
+/* Answer disclaimer */
+.answer-disclaimer {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.answer-disclaimer.general-guidance-disclaimer {
+    background-color: #fffbeb;
+    border: 1px solid #fcd34d;
+    color: #92400e;
+}
+
+.disclaimer-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.disclaimer-content {
+    flex: 1;
+}
+
+.disclaimer-title {
+    margin: 0 0 0.25rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.disclaimer-text {
+    margin: 0;
+    line-height: 1.4;
+    font-size: 0.8125rem;
+}

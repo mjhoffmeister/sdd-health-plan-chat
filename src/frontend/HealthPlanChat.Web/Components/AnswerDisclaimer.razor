@@ -1,0 +1,23 @@
+@using HealthPlanChat.Web.Services
+
+@if (Type == AnswerType.GeneralGuidance)
+{
+    <div class="answer-disclaimer general-guidance-disclaimer">
+        <span class="disclaimer-icon">⚠️</span>
+        <div class="disclaimer-content">
+            <p class="disclaimer-title">General Guidance Notice</p>
+            <p class="disclaimer-text">
+                This response is general guidance and not based on your specific plan documents.
+                For accurate coverage information, please refer to your official plan documents or contact your plan administrator.
+            </p>
+        </div>
+    </div>
+}
+
+@code {
+    /// <summary>
+    /// The answer type to determine which disclaimer to show.
+    /// </summary>
+    [Parameter]
+    public AnswerType Type { get; set; }
+}

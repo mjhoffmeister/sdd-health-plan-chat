@@ -1,7 +1,10 @@
-using HealthPlanChat.Core.UseCases.Contracts;
-using HealthPlanChat.WebApi.Presenters;
-using Microsoft.AspNetCore.Http.HttpResults;
+using HealthPlanChat.Core.UseCases;
+using HealthPlanChat.Core.UseCases.Chat;
+using HealthPlanChat.WebApi.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using CoreChatRequest = HealthPlanChat.Core.UseCases.Chat.ChatRequest;
+using ApiChatRequest = HealthPlanChat.WebApi.Contracts.ChatRequest;
+using ApiChatResponse = HealthPlanChat.WebApi.Contracts.ChatResponse;
 
 namespace HealthPlanChat.WebApi.Endpoints;
 
@@ -20,16 +23,11 @@ public static class ChatEndpoints
         var group = app.MapGroup("/api")
             .WithTags("Chat");
 
-        group.MapPost("/sessions", CreateSession)
-            .WithName("CreateSession")
-            .WithSummary("Start a new chat session")
-            .Produces<CreateSessionResponse>(StatusCodes.Status201Created)
-            .Produces(StatusCodes.Status500InternalServerError);
-
         group.MapPost("/chat", SendMessage)
             .WithName("SendMessage")
             .WithSummary("Send a chat message")
-            .Produces<ChatResponse>(StatusCodes.Status200OK)
+            .WithDescription("Sends a message to the health plan assistant. If no sessionId is provided, a new session is created.")
+            .Produces<ApiChatResponse>(StatusCodes.Status200OK)
             .Produces<ProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status500InternalServerError);
@@ -38,60 +36,15 @@ public static class ChatEndpoints
     }
 
     /// <summary>
-    /// Creates a new chat session.
-    /// POST /api/sessions
-    /// </summary>
-    private static async Task<Results<Created<CreateSessionResponse>, StatusCodeHttpResult>> CreateSession(
-        [FromServices] CreateSessionPresenter presenter,
-        CancellationToken cancellationToken)
-    {
-        var response = await presenter.CreateSessionAsync(cancellationToken);
-        return TypedResults.Created($"/api/sessions/{response.SessionId}", response);
-    }
-
-    /// <summary>
     /// Sends a chat message and receives a response.
     /// POST /api/chat
     /// </summary>
-    private static async Task<Results<Ok<ChatResponse>, BadRequest<ProblemDetails>, NotFound<ProblemDetails>>> SendMessage(
-        [FromBody] ChatRequest request,
-        [FromServices] ChatPresenter presenter,
+    private static async Task<IResult> SendMessage(
+        [FromBody] ApiChatRequest request,
+        [FromServices] IUseCaseInteractor<CoreChatRequest, IResult> interactor,
         CancellationToken cancellationToken)
     {
-        // Validate request
-        if (string.IsNullOrWhiteSpace(request.SessionId))
-        {
-            return TypedResults.BadRequest(new ProblemDetails
-            {
-                Title = "Bad Request",
-                Detail = "SessionId is required.",
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-
-        if (string.IsNullOrWhiteSpace(request.Message))
-        {
-            return TypedResults.BadRequest(new ProblemDetails
-            {
-                Title = "Bad Request",
-                Detail = "Message is required and cannot be empty.",
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
-
-        try
-        {
-            var response = await presenter.ProcessChatAsync(request, cancellationToken);
-            return TypedResults.Ok(response);
-        }
-        catch (InvalidOperationException ex) when (ex.Message.Contains("Session not found"))
-        {
-            return TypedResults.NotFound(new ProblemDetails
-            {
-                Title = "Not Found",
-                Detail = "The specified session was not found or has expired.",
-                Status = StatusCodes.Status404NotFound
-            });
-        }
+        var coreRequest = new CoreChatRequest(request.SessionId, request.Message);
+        return await interactor.HandleAsync(coreRequest, cancellationToken);
     }
 }

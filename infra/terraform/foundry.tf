@@ -50,3 +50,26 @@ resource "azapi_resource" "foundry_project" {
 
   response_export_values = ["properties"]
 }
+
+# Connection from Foundry project to Azure AI Search
+# Enables agents to use AzureAISearchAgentTool for native RAG
+resource "azapi_resource" "foundry_search_connection" {
+  type      = "Microsoft.CognitiveServices/accounts/projects/connections@2025-04-01-preview"
+  name      = "ai-search"
+  parent_id = azapi_resource.foundry_project.id
+
+  body = {
+    properties = {
+      category         = "CognitiveSearch"
+      target           = "https://${azapi_resource.search_service.name}.search.windows.net"
+      authType         = "AAD"
+      isSharedToAll    = true
+      metadata = {
+        ApiVersion = "2024-05-01-preview"
+        ResourceId = azapi_resource.search_service.id
+      }
+    }
+  }
+
+  depends_on = [azapi_resource.search_service]
+}

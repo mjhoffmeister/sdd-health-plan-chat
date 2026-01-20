@@ -12,6 +12,14 @@ namespace HealthPlanChat.Infrastructure.Search;
 /// <summary>
 /// Azure AI Search implementation of <see cref="IPlanMaterialSearch"/>.
 /// </summary>
+/// <remarks>
+/// <b>Note:</b> As of the agent-native RAG refactor, the chat agent handles retrieval
+/// internally via the Azure AI Search tool (AzureAISearchAgentTool). This adapter is
+/// retained for:
+/// - Index maintenance and administration utilities
+/// - Direct search scenarios outside the chat flow
+/// - Testing and debugging search behavior
+/// </remarks>
 public sealed class AzureAiSearchPlanMaterialSearch : IPlanMaterialSearch
 {
     private readonly ILogger<AzureAiSearchPlanMaterialSearch> _logger;

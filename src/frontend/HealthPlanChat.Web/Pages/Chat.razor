@@ -49,6 +49,10 @@
                 <div class="message-content">
                     @message.Text
                 </div>
+                @if (message.AnswerType.HasValue)
+                {
+                    <AnswerDisclaimer Type="@message.AnswerType.Value" />
+                }
                 @if (message.References.Count > 0)
                 {
                     <ReferencesList References="@message.References" />

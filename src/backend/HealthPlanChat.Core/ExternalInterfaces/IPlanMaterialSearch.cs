@@ -5,6 +5,13 @@ namespace HealthPlanChat.Core.ExternalInterfaces;
 /// <summary>
 /// Interface for searching plan materials.
 /// </summary>
+/// <remarks>
+/// <b>Note:</b> As of the agent-native RAG refactor, the chat agent handles retrieval
+/// internally via the Azure AI Search tool. This interface is retained for:
+/// - Index maintenance utilities
+/// - Direct search scenarios outside the chat flow
+/// - Backward compatibility during transition
+/// </remarks>
 public interface IPlanMaterialSearch
 {
     /// <summary>

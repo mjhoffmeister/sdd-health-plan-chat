@@ -1,4 +1,4 @@
-namespace HealthPlanChat.Core.UseCases.Contracts;
+namespace HealthPlanChat.Core.Domain.Chat;
 
 /// <summary>
 /// A citation reference to a plan document.

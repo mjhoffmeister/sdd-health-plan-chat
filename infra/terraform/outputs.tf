@@ -72,3 +72,14 @@ output "static_web_app_hostname" {
   description = "Static Web App default hostname"
   value       = azapi_resource.static_web_app.output.properties.defaultHostname
 }
+
+# Agent Framework search connection
+output "foundry_search_connection_id" {
+  description = "Connection ID for Azure AI Search in Foundry project (for AzureAISearchAgentTool)"
+  value       = azapi_resource.foundry_search_connection.id
+}
+
+output "search_service_name" {
+  description = "Azure AI Search service name"
+  value       = azapi_resource.search_service.name
+}
