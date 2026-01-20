@@ -127,8 +127,7 @@ jobs:
           swa deploy ./publish/frontend \
             --app-name ${{ vars.AZURE_SWA_NAME }} \
             --resource-group ${{ vars.AZURE_RESOURCE_GROUP_NAME }} \
-            --env production \
-            --no-build
+            --env production
 
       - name: Sync Plan Materials to Blob Storage
         run: |
