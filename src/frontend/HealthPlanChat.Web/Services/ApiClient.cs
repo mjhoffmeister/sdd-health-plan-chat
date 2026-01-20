@@ -15,17 +15,6 @@ public sealed class ApiClient
     }
 
     /// <summary>
-    /// Creates a new chat session.
-    /// </summary>
-    /// <returns>The created session response.</returns>
-    public async Task<CreateSessionResponse?> CreateSessionAsync(CancellationToken cancellationToken = default)
-    {
-        var response = await _httpClient.PostAsync("/api/sessions", null, cancellationToken);
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<CreateSessionResponse>(cancellationToken);
-    }
-
-    /// <summary>
     /// Sends a chat message and receives a response.
     /// </summary>
     /// <param name="request">The chat request.</param>
@@ -56,19 +45,15 @@ public sealed class ApiClient
 }
 
 /// <summary>
-/// Response returned when a new chat session is created.
-/// </summary>
-public sealed record CreateSessionResponse(string SessionId);
-
-/// <summary>
 /// Request to send a chat message.
 /// </summary>
-public sealed record ChatRequest(string SessionId, string Message);
+public sealed record ChatRequest(string? SessionId, string Message);
 
 /// <summary>
 /// Response containing the assistant's answer.
 /// </summary>
 public sealed record ChatResponse(
+    string SessionId,
     AnswerType AnswerType,
     string AnswerText,
     IReadOnlyList<Reference> References);

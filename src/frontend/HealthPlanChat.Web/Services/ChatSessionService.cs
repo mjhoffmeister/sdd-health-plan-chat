@@ -47,40 +47,16 @@ public sealed class ChatSessionService
     public event Action? OnStateChanged;
 
     /// <summary>
-    /// Initializes a new chat session.
+    /// Initializes a new chat session (clears state, session ID assigned on first message).
     /// </summary>
-    public async Task InitializeSessionAsync(CancellationToken cancellationToken = default)
+    public Task InitializeSessionAsync(CancellationToken cancellationToken = default)
     {
-        try
-        {
-            _isLoading = true;
-            _error = null;
-            NotifyStateChanged();
-
-            var response = await _apiClient.CreateSessionAsync(cancellationToken);
-            if (response is not null)
-            {
-                _sessionId = response.SessionId;
-                _messages.Clear();
-            }
-            else
-            {
-                _error = "Failed to create session. Please try again.";
-            }
-        }
-        catch (HttpRequestException ex)
-        {
-            _error = $"Network error: {ex.Message}";
-        }
-        catch (Exception ex)
-        {
-            _error = $"An error occurred: {ex.Message}";
-        }
-        finally
-        {
-            _isLoading = false;
-            NotifyStateChanged();
-        }
+        // Session is created implicitly on first message, just mark as ready
+        _sessionId = string.Empty; // Empty string indicates ready but no server-side session yet
+        _messages.Clear();
+        _error = null;
+        NotifyStateChanged();
+        return Task.CompletedTask;
     }
 
     /// <summary>
@@ -92,13 +68,6 @@ public sealed class ChatSessionService
     {
         if (string.IsNullOrWhiteSpace(message))
             return;
-
-        if (string.IsNullOrEmpty(_sessionId))
-        {
-            _error = "No active session. Please start a new chat.";
-            NotifyStateChanged();
-            return;
-        }
 
         try
         {
@@ -114,12 +83,16 @@ public sealed class ChatSessionService
             });
             NotifyStateChanged();
 
-            // Send to API
-            var request = new ChatRequest(_sessionId, message);
+            // Send to API (null sessionId for first message creates a new session)
+            var sessionIdToSend = string.IsNullOrEmpty(_sessionId) ? null : _sessionId;
+            var request = new ChatRequest(sessionIdToSend, message);
             var response = await _apiClient.SendMessageAsync(request, cancellationToken);
 
             if (response is not null)
             {
+                // Store the session ID from response (important for first message)
+                _sessionId = response.SessionId;
+
                 // Add assistant message
                 _messages.Add(new ChatMessageViewModel
                 {
