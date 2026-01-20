@@ -100,6 +100,10 @@ jobs:
           name: frontend
           path: ./publish/frontend
 
+      - name: Configure frontend API URL
+        run: |
+          echo '{"ApiBaseUrl":"https://${{ vars.AZURE_APP_SERVICE_NAME }}.azurewebsites.net"}' > ./publish/frontend/appsettings.json
+
       - name: Download plan materials
         uses: actions/download-artifact@v4
         with:
