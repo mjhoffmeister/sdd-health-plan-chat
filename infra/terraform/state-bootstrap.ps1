@@ -94,6 +94,19 @@ Write-Host "Creating Storage Account: $StorageAccountName..." -ForegroundColor Y
 $saExists = az storage account show --name $StorageAccountName --resource-group $ResourceGroupName 2>&1
 if ($LASTEXITCODE -eq 0) {
     Write-Host "  Storage Account already exists." -ForegroundColor Green
+
+    # Ensure network rules allow GitHub-hosted runners to reach the account.
+    # Some environments enforce restrictive defaults via Azure Policy.
+    Write-Host "  Ensuring public network access is enabled for state bootstrap..." -ForegroundColor Yellow
+    az storage account update `
+        --name $StorageAccountName `
+        --resource-group $ResourceGroupName `
+        --set publicNetworkAccess=Enabled networkRuleSet.defaultAction=Allow `
+        --output none
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to update Storage Account network rules for state bootstrap."
+        exit 1
+    }
 } else {
     az storage account create `
         --name $StorageAccountName `
