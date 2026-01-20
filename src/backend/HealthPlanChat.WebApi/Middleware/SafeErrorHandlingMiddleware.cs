@@ -55,8 +55,10 @@ public sealed class SafeErrorHandlingMiddleware
         }
         catch (Exception ex)
         {
-            // Log exception type and correlation info, but NOT the message (may contain user data)
+            // Log exception type and correlation info
+            // NOTE: In development, log full exception for debugging
             _logger.LogError(
+                ex, // Include full exception for stack trace
                 "Unhandled exception. Type: {ExceptionType}, Path: {Path}, TraceId: {TraceId}",
                 ex.GetType().Name,
                 context.Request.Path,

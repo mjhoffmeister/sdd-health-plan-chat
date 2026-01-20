@@ -19,6 +19,11 @@ on:
           - plan
           - apply
           - destroy
+      developer_principal_id:
+        description: 'Azure AD Object ID for developer Redis access (optional, for local debugging)'
+        required: false
+        default: ''
+        type: string
 
 permissions:
   id-token: write
@@ -27,6 +32,7 @@ permissions:
 env:
   TF_VAR_github_repository: ${{ github.repository }}
   TF_VAR_github_environment: ${{ inputs.environment }}
+  TF_VAR_developer_principal_id: ${{ inputs.developer_principal_id }}
   ARM_USE_OIDC: true
   ARM_USE_AZUREAD: true
   # State storage settings

@@ -29,6 +29,12 @@ variable "github_environment" {
   default     = "demo"
 }
 
+variable "developer_principal_id" {
+  description = "Azure AD Object ID of developer for local debugging access (optional)"
+  type        = string
+  default     = ""
+}
+
 # Local values for consistent naming
 locals {
   resource_prefix = "${var.project_name}-${var.environment}"

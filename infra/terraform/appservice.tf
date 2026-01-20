@@ -119,6 +119,35 @@ resource "azapi_update_resource" "app_service_auth" {
   }
 }
 
+# Configure App Service logging
+resource "azapi_update_resource" "app_service_logs" {
+  type        = "Microsoft.Web/sites/config@2024-04-01"
+  resource_id = "${azapi_resource.app_service.id}/config/logs"
+
+  body = {
+    properties = {
+      applicationLogs = {
+        fileSystem = {
+          level = "Information"
+        }
+      }
+      detailedErrorMessages = {
+        enabled = true
+      }
+      failedRequestsTracing = {
+        enabled = true
+      }
+      httpLogs = {
+        fileSystem = {
+          enabled        = true
+          retentionInDays = 7
+          retentionInMb  = 35
+        }
+      }
+    }
+  }
+}
+
 # Role assignments for App Service managed identity
 
 # Search Index Data Reader

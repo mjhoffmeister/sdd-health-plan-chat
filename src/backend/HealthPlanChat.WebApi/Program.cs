@@ -8,6 +8,12 @@ using HealthPlanChat.WebApi.Presenters;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add optional local configuration override (gitignored, for local dev with real Azure resources)
+builder.Configuration.AddJsonFile(
+    $"appsettings.{builder.Environment.EnvironmentName}.local.json",
+    optional: true,
+    reloadOnChange: true);
+
 // Bind configuration sections
 builder.Services.Configure<AppOptions>(builder.Configuration.GetSection(AppOptions.SectionKey));
 builder.Services.Configure<RetrievalOptions>(builder.Configuration.GetSection(RetrievalOptions.SectionKey));

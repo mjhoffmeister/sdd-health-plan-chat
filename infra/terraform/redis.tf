@@ -64,3 +64,25 @@ resource "azapi_resource" "redis_app_access" {
 
   depends_on = [azapi_resource.app_service]
 }
+
+# Redis access assignment for developer identity (local debugging)
+# Only created if developer_principal_id is specified
+resource "azapi_resource" "redis_developer_access" {
+  count     = var.developer_principal_id != "" ? 1 : 0
+  type      = "Microsoft.Cache/redisEnterprise/databases/accessPolicyAssignments@2025-04-01"
+  name      = "developeraccess"
+  parent_id = azapi_resource.redis_database.id
+
+  schema_validation_enabled = false
+
+  body = {
+    properties = {
+      accessPolicyName = "default"
+      user = {
+        objectId = var.developer_principal_id
+      }
+    }
+  }
+
+  depends_on = [azapi_resource.redis_database]
+}

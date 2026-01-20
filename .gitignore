@@ -95,3 +95,5 @@ yarn-error.log*
 # Publish output
 publish/
 wwwroot/_framework/
+app-logs/
+app-logs.zip
