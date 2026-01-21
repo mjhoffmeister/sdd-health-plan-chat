@@ -185,6 +185,7 @@ Granted via `developer_principal_id` variable for local testing with real Azure 
 | Azure Managed Redis | Redis Data Owner | `8b6933ec-85ac-4cf4-8654-df7cf19d2d5c` | Local debugging access |
 | Azure AI Search | Search Service Contributor | `7ca78c08-252a-4471-8644-bb5ff32d4ba0` | Manage indexes locally |
 | Azure AI Search | Search Index Data Contributor | `8ebe5a00-799e-43f5-93ac-243d3dce84a7` | Manage index data locally |
+| Azure Blob Storage | Storage Blob Data Contributor | `ba92f5b4-2d11-453d-a403-e96b0029c9fe` | Run search setup script (indexer needs blob access) |
 
 Re-check Constitution: PASS (security, simplicity, and testability preserved; external dependencies isolated behind interfaces).
 

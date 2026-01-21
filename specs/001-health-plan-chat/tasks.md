@@ -161,10 +161,11 @@
 **Purpose**: Additional infrastructure and tooling discovered during deployment debugging.
 
 - [X] T079 [P] Add developer local debugging RBAC in `infra/terraform/redis.tf` and `infra/terraform/search.tf`: optional `developer_principal_id` variable grants Redis Data Owner and Search Index Data Contributor roles for local testing with real Azure resources
-- [X] T080 [P] Create Search index setup script in `scripts/setup-search-index.ps1`: creates `plan-materials` index (vector + semantic config), data source, skillset (with Azure OpenAI embedding), and indexer via Search REST API (data-plane resources not supported by ARM/Terraform)
+- [X] T080 [P] Create Search index setup script in `scripts/setup-search-index.ps1`: creates `plan-materials` index (vector + semantic config with **integrated vectorizer** for query-time embedding), data source (**managed identity** via `ResourceId` connection string), skillset (with Azure OpenAI embedding), and indexer via Search REST API (data-plane resources not supported by ARM/Terraform); supports `-Force` (recreate) and `-ResetIndexer` (reprocess existing blobs) flags
 - [X] T081 [P] Add `.local.json` config file loading pattern in `src/backend/HealthPlanChat.WebApi/Program.cs`: loads `appsettings.{Environment}.local.json` (gitignored) for local development with real Azure resources
 - [X] T082 [P] Fix Foundry endpoint format in `infra/terraform/appservice.tf`: use project URL format (`https://{name}.services.ai.azure.com/api/projects/{project}`) required by Persistent Agents API
 - [X] T083 [P] Add `developer_principal_id` workflow input in `.github/workflows/infra.yml` for provisioning developer RBAC via pipeline
+- [X] T084 [P] Fix `Foundry__SearchConnectionId` app setting in `infra/terraform/appservice.tf`: use connection `.name` (`ai-search`) not `.id` (full ARM resource ID) — agent expects connection name only
 
 ---
 
@@ -186,9 +187,9 @@
 
 ---
 
-## Phase 6: Polish & Cross-Cutting Concerns
+## Phase 6: Polish & Cross-Cutting Concerns (Post-MVP)
 
-**Purpose**: Infrastructure, deployment, and demo hardening.
+**Purpose**: Infrastructure, deployment, and demo hardening. **These tasks are optional stretch goals** — the MVP is functional without them.
 
 - [ ] T060 Add runtime configuration docs in `specs/001-health-plan-chat/quickstart.md` (Azure env vars and expected settings)
 - [ ] T061 Validate Quickstart end-to-end and update `specs/001-health-plan-chat/quickstart.md` with final commands (include a short demo checklist using `data/demo-questions.json` for SC-001 spot-checks)
