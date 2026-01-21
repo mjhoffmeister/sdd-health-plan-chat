@@ -50,6 +50,40 @@ resource "azapi_resource" "search_foundry_role" {
   }
 }
 
+# Foundry project identity needs Search Index Data Reader for azure_ai_search tool
+resource "azapi_resource" "foundry_search_data_reader" {
+  type      = "Microsoft.Authorization/roleAssignments@2022-04-01"
+  name      = uuidv5("dns", "${azapi_resource.search_service.id}-foundry-project-reader")
+  parent_id = azapi_resource.search_service.id
+
+  body = {
+    properties = {
+      roleDefinitionId = "/subscriptions/${data.azurerm_subscription.current.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/1407120a-92aa-4202-b7e9-c0e197c71c8f" # Search Index Data Reader
+      principalId      = azapi_resource.foundry_project.identity[0].principal_id
+      principalType    = "ServicePrincipal"
+    }
+  }
+
+  depends_on = [azapi_resource.foundry_project]
+}
+
+# Foundry project identity needs Search Service Contributor for azure_ai_search tool
+resource "azapi_resource" "foundry_search_contributor" {
+  type      = "Microsoft.Authorization/roleAssignments@2022-04-01"
+  name      = uuidv5("dns", "${azapi_resource.search_service.id}-foundry-project-contributor")
+  parent_id = azapi_resource.search_service.id
+
+  body = {
+    properties = {
+      roleDefinitionId = "/subscriptions/${data.azurerm_subscription.current.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/7ca78c08-252a-4471-8644-bb5ff32d4ba0" # Search Service Contributor
+      principalId      = azapi_resource.foundry_project.identity[0].principal_id
+      principalType    = "ServicePrincipal"
+    }
+  }
+
+  depends_on = [azapi_resource.foundry_project]
+}
+
 # NOTE: Search index, datasource, skillset, and indexer must be created via Azure CLI
 # or Search REST API after infrastructure is deployed. ARM doesn't support these
 # data-plane resources. Use scripts/setup-search-index.ps1 after terraform apply.

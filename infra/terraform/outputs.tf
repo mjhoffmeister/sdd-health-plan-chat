@@ -75,8 +75,8 @@ output "static_web_app_hostname" {
 
 # Agent Framework search connection
 output "foundry_search_connection_id" {
-  description = "Connection ID for Azure AI Search in Foundry project (for AzureAISearchAgentTool)"
-  value       = azapi_resource.foundry_search_connection.id
+  description = "Connection name for Azure AI Search in Foundry project (for AzureAISearchAgentTool)"
+  value       = azapi_resource.foundry_search_connection.name
 }
 
 output "search_service_name" {
