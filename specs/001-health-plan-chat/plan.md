@@ -113,7 +113,7 @@ Outputs:
 Key outcomes:
 - Confirmed Clean Architecture split for backend.
 - Confirmed RAG via Azure AI Search over synthetic plan JSON.
-- Confirmed Azure AI Foundry models: `text-embedding-3-small` + `gpt-5-mini`.
+- Confirmed Azure AI Foundry models: `text-embedding-3-small` + `gpt-4o` (note: gpt-4o required for `azure_ai_search` tool support).
 - Confirmed session history stored in Azure Managed Redis (Redis Enterprise) with TTL.
 
 ## Indexing Strategy
@@ -163,9 +163,28 @@ Least-privilege roles for runtime operations only:
 | Target Service | Role | Role Definition ID | Justification |
 |----------------|------|-------------------|---------------|
 | Azure AI Search | Search Index Data Reader | `1407120a-92aa-4202-b7e9-c0e197c71c8f` | Query plan-materials index |
-| Azure AI Foundry | Cognitive Services User | `a97b65f3-24c7-4388-baec-2e87135dc908` | Invoke gpt-5-mini and embeddings |
-| Azure Managed Redis | *(access key via app settings)* | — | Session store read/write |
+| Azure AI Foundry | Cognitive Services User | `a97b65f3-24c7-4388-baec-2e87135dc908` | Invoke gpt-4o and embeddings |
+| Azure Managed Redis | Redis Data Owner (Entra ID) | `8b6933ec-85ac-4cf4-8654-df7cf19d2d5c` | Session store read/write via managed identity |
 | Blob Storage | **None** | — | Content accessed via Search index; blobs seeded by CI/CD workflow (WIF identity) |
+
+### Foundry Project Identity Role Assignments
+
+Required for agent-native RAG via `AzureAISearchAgentTool`:
+
+| Target Service | Role | Role Definition ID | Justification |
+|----------------|------|-------------------|---------------|
+| Azure AI Search | Search Index Data Reader | `1407120a-92aa-4202-b7e9-c0e197c71c8f` | Agent queries index for RAG |
+| Azure AI Search | Search Service Contributor | `7ca78c08-252a-4471-8644-bb5ff32d4ba0` | Agent creates/manages index resources |
+
+### Developer Local Debugging RBAC (Optional)
+
+Granted via `developer_principal_id` variable for local testing with real Azure resources:
+
+| Target Service | Role | Role Definition ID | Justification |
+|----------------|------|-------------------|---------------|
+| Azure Managed Redis | Redis Data Owner | `8b6933ec-85ac-4cf4-8654-df7cf19d2d5c` | Local debugging access |
+| Azure AI Search | Search Service Contributor | `7ca78c08-252a-4471-8644-bb5ff32d4ba0` | Manage indexes locally |
+| Azure AI Search | Search Index Data Contributor | `8ebe5a00-799e-43f5-93ac-243d3dce84a7` | Manage index data locally |
 
 Re-check Constitution: PASS (security, simplicity, and testability preserved; external dependencies isolated behind interfaces).
 

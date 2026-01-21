@@ -50,11 +50,11 @@
 - [X] T017 Configure Terraform remote state backend in `infra/terraform/providers.tf` using `backend "azurerm" {}` and pass concrete backend settings via `-backend-config` from the workflow (single demo environment: one storage account/container/key; avoid hardcoding names in code)
 - [X] T018 [P] Add Terraform resources for App Service + plan in `infra/terraform/appservice.tf`
 - [X] T019 [P] Add Terraform resources for Static Web Apps in `infra/terraform/swa.tf`
-- [X] T020 [P] Add Terraform resources for Azure AI Search in `infra/terraform/search.tf`: (1) Search service with system-assigned managed identity, (2) Index schema with vector field, (3) Data source connecting to Blob container, (4) Skillset with `AzureOpenAIEmbedding` skill calling `text-embedding-3-small`, (5) Indexer with blob trigger and JSON parsing
+- [X] T020 [P] Add Terraform resources for Azure AI Search in `infra/terraform/search.tf`: (1) Search service with system-assigned managed identity, (2) RBAC role assignments for Search/Foundry/developer identities. Note: Index, data source, skillset, and indexer are data-plane resources created via `scripts/setup-search-index.ps1` after terraform apply.
 - [X] T021 [P] Add Terraform resources for Storage account + container in `infra/terraform/storage.tf`
 - [X] T022 [P] Add Terraform resources for Azure Managed Redis (Redis Enterprise) in `infra/terraform/redis.tf` using AzAPI: `Microsoft.Cache/redisEnterprise@2025-04-01` AND the required child `Microsoft.Cache/redisEnterprise/databases@2025-04-01` (create `default` database)
 - [X] T023 [P] Add Terraform resources for Azure AI Foundry / Azure AI Services account in `infra/terraform/foundry.tf`
-- [X] T024 [P] Add Terraform model deployments for `gpt-5-mini` and `text-embedding-3-small` in `infra/terraform/foundry.deployments.tf`
+- [X] T024 [P] Add Terraform model deployments for `gpt-4o` and `text-embedding-3-small` in `infra/terraform/foundry.deployments.tf` (note: gpt-4o required for `azure_ai_search` tool support)
 - [X] T025 [P] Add GitHub Actions Workload Identity Federation (WIF/OIDC) setup in `infra/terraform/identity.tf`: create a new Entra application registration (no pre-existing app), ensure its service principal exists in the tenant, add federated identity credential(s) scoped to this repo, and output values needed by workflows (`AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `AZURE_CLIENT_ID`)
 - [X] T026 [P] Add Terraform role assignments co-located with the owning resources: App Service managed identity access in `infra/terraform/appservice.tf` (Search Index Data Reader for AI Search, Cognitive Services User for AI Foundry; no Blob Storage role—indexed content accessed via Search); Search Service managed identity in `infra/terraform/search.tf` (Storage Blob Data Reader for blob access, Cognitive Services User for embedding skillset); any service-specific roles in their respective files (`infra/terraform/foundry.tf`, `infra/terraform/redis.tf`)
 - [X] T027 Add GitHub Actions workflow for infra deploy (WIF/OIDC + `workflow_dispatch`) in `.github/workflows/infra.yml` implementing Pattern 2: `azure/login` (OIDC) → run `infra/terraform/state-bootstrap.ps1` → `terraform init` with `-backend-config` → `terraform plan/apply` (no client secrets)
@@ -153,6 +153,18 @@
 - [X] T078 [P] Evaluate `HealthPlanChat.Infrastructure.Search` project — keep for index maintenance utilities or remove if fully replaced by agent tool
 
 **Checkpoint**: Agent handles retrieval natively via `AzureAISearchAgentTool`. `ChatInteractor` no longer queries search directly. Existing US1/US2 tests still pass (answerType + references work as before).
+
+---
+
+## Deployment Support Tasks
+
+**Purpose**: Additional infrastructure and tooling discovered during deployment debugging.
+
+- [X] T079 [P] Add developer local debugging RBAC in `infra/terraform/redis.tf` and `infra/terraform/search.tf`: optional `developer_principal_id` variable grants Redis Data Owner and Search Index Data Contributor roles for local testing with real Azure resources
+- [X] T080 [P] Create Search index setup script in `scripts/setup-search-index.ps1`: creates `plan-materials` index (vector + semantic config), data source, skillset (with Azure OpenAI embedding), and indexer via Search REST API (data-plane resources not supported by ARM/Terraform)
+- [X] T081 [P] Add `.local.json` config file loading pattern in `src/backend/HealthPlanChat.WebApi/Program.cs`: loads `appsettings.{Environment}.local.json` (gitignored) for local development with real Azure resources
+- [X] T082 [P] Fix Foundry endpoint format in `infra/terraform/appservice.tf`: use project URL format (`https://{name}.services.ai.azure.com/api/projects/{project}`) required by Persistent Agents API
+- [X] T083 [P] Add `developer_principal_id` workflow input in `.github/workflows/infra.yml` for provisioning developer RBAC via pipeline
 
 ---
 

@@ -84,6 +84,38 @@ resource "azapi_resource" "foundry_search_contributor" {
   depends_on = [azapi_resource.foundry_project]
 }
 
+# Developer identity needs Search Service Contributor for index management
+resource "azapi_resource" "developer_search_contributor" {
+  count     = var.developer_principal_id != "" ? 1 : 0
+  type      = "Microsoft.Authorization/roleAssignments@2022-04-01"
+  name      = uuidv5("dns", "${azapi_resource.search_service.id}-developer-contributor")
+  parent_id = azapi_resource.search_service.id
+
+  body = {
+    properties = {
+      roleDefinitionId = "/subscriptions/${data.azurerm_subscription.current.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/7ca78c08-252a-4471-8644-bb5ff32d4ba0" # Search Service Contributor
+      principalId      = var.developer_principal_id
+      principalType    = "User"
+    }
+  }
+}
+
+# Developer identity needs Search Index Data Contributor for data operations
+resource "azapi_resource" "developer_search_data_contributor" {
+  count     = var.developer_principal_id != "" ? 1 : 0
+  type      = "Microsoft.Authorization/roleAssignments@2022-04-01"
+  name      = uuidv5("dns", "${azapi_resource.search_service.id}-developer-data-contributor")
+  parent_id = azapi_resource.search_service.id
+
+  body = {
+    properties = {
+      roleDefinitionId = "/subscriptions/${data.azurerm_subscription.current.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/8ebe5a00-799e-43f5-93ac-243d3dce84a7" # Search Index Data Contributor
+      principalId      = var.developer_principal_id
+      principalType    = "User"
+    }
+  }
+}
+
 # NOTE: Search index, datasource, skillset, and indexer must be created via Azure CLI
 # or Search REST API after infrastructure is deployed. ARM doesn't support these
 # data-plane resources. Use scripts/setup-search-index.ps1 after terraform apply.

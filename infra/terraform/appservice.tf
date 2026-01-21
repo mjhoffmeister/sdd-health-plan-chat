@@ -65,11 +65,11 @@ resource "azapi_resource" "app_service" {
           },
           {
             name  = "Foundry__Endpoint"
-            value = azapi_resource.ai_services.output.properties.endpoint
+            value = "https://${azapi_resource.ai_services.name}.services.ai.azure.com/api/projects/${azapi_resource.foundry_project.name}"
           },
           {
             name  = "Foundry__ChatModelDeployment"
-            value = "gpt-5-mini"
+            value = "gpt-4o"
           },
           {
             name  = "Foundry__EmbeddingModelDeployment"

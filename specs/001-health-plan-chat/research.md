@@ -17,7 +17,7 @@ This document resolves technical unknowns and records key implementation decisio
   - Local in-memory search: acceptable for unit tests via DI test doubles, but not supported as a runtime mode (Azure-first).
 
 ### 3) Embeddings + chat models: Azure AI Foundry
-- Decision: Use `text-embedding-3-small` (global) for embeddings and `gpt-5-mini` (global) for chat completions.
+- Decision: Use `text-embedding-3-small` (global) for embeddings and `gpt-4o` (global) for chat completions. Note: gpt-4o is required because it supports the `azure_ai_search` tool used by Agent Framework.
 - Rationale: Matches prompt tech decisions; balances quality/cost for demo.
 - Alternatives considered:
   - Larger models: higher cost and latency without demo value.

@@ -16,7 +16,8 @@ public sealed class FoundryOptions
     public string Endpoint { get; set; } = string.Empty;
 
     /// <summary>
-    /// Model deployment name for chat completions. Default: "gpt-5-mini".
+    /// Model deployment name for chat completions. Default: "gpt-4o".
+    /// Note: gpt-4o is required for azure_ai_search tool support in Agent Framework.
     /// </summary>
     public string ChatModelDeployment { get; set; } = "gpt-4o";
 

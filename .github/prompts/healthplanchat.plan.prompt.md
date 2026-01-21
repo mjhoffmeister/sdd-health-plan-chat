@@ -22,7 +22,7 @@ current feature spec.
 - Agent orchestration: use the lastest preview version of Agent Framework.
 - Azure App Service for hosting the backend API.
 - Azure AI Foundry for AI model hosting. Use text-embedding-3-small global for
-  embeddings and gpt-5-mini global for chat completions.
+  embeddings and gpt-4o global for chat completions (gpt-4o required for azure_ai_search tool).
 - Azure Managed Redis for chat history caching (do not use Azure Cache for
   Redis). See:
   https://learn.microsoft.com/en-us/azure/redis/web-app-aspnet-core-howto?pivots=azure-managed-redis
