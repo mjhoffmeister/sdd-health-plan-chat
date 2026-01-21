@@ -207,13 +207,8 @@
 
 ### Documentation & Configuration
 
-- [ ] T060 Add runtime configuration docs in `specs/001-health-plan-chat/quickstart.md` (Azure env vars and expected settings)
 - [ ] T061 Validate Quickstart end-to-end and update `specs/001-health-plan-chat/quickstart.md` with final commands (include a short demo checklist using `data/demo-questions.json` for SC-001 spot-checks)
 - [ ] T062 Add Core unit tests for `ChatInteractor` (labeling: Grounded vs GeneralGuidance; references shape; deterministic behavior) in `src/backend/HealthPlanChat.Core.UnitTests/UseCases/Chat/ChatInteractorTests.cs`
-- [ ] T063 Add unit tests for `PromptBuilder` (citations formatting; “no hallucinated citations” rules; consistent labeling) in `src/backend/HealthPlanChat.Infrastructure.Prompting.UnitTests/PromptBuilderTests.cs`
-- [ ] T064 Add minimal API smoke/integration tests for `POST /api/sessions` and `POST /api/chat` using DI test doubles for external services (no network/cloud dependencies) in `src/backend/HealthPlanChat.Infrastructure.IntegrationTests/ChatEndpointsTests.cs`
-- [ ] T065 Wire config binding in `src/backend/HealthPlanChat.Bootstrapper/ServiceCollectionExtensions.cs` (managed identity by default; if any secrets are unavoidable, store them as GitHub Actions environment secrets and inject via app settings at deploy time)
-- [ ] T066 Add request timing + structured logging for `/api/chat` (record duration + answerType; avoid logging prompt/user content) in `src/backend/HealthPlanChat.WebApi/Middleware/RequestTimingMiddleware.cs`
 
 ---
 

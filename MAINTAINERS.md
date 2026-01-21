@@ -36,11 +36,7 @@ Existing implement tag(s):
 - `phase/05-implement/03-ask-plan-questions` = start of implementation Phase 3 (Ask Plan Questions)
 - `phase/05-implement/04-handle-missing-answers` = start of implementation Phase 4 (Handle Missing Answers)
 - `phase/05-implement/05-ui` = start of implementation Phase 5 (UI)
-
-Planned next tags (created as implementation progresses):
-- `phase/05-implement/06-us2` = start of implementation Phase 6 (US2)
-- `phase/05-implement/07-us3` = start of implementation Phase 7 (US3)
-- `phase/05-implement/08-polish` = start of implementation Phase 8 (Polish)
+- `phase/05-implement/06-documentation` = start of implementation Phase 6 (Documentation)
 
 Workflow rule: when you finish a phase and check in, tag the *start of the next phase* at that commit.
 
