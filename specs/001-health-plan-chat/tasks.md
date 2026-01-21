@@ -203,6 +203,7 @@
 
 - [X] T090 [P] Auto-scroll messages container to bottom when new messages arrive or loading state changes in `src/frontend/HealthPlanChat.Web/Pages/Chat.razor` (use JS interop `scrollIntoView` or set `scrollTop` after render; scroll on: user sends message, assistant response received, loading indicator appears)
 - [X] T091 [P] Style scrollbar for messages container in `src/frontend/HealthPlanChat.Web/wwwroot/css/app.css` (use `::-webkit-scrollbar` for Chromium/Safari with theme-aware colors; add `scrollbar-color` and `scrollbar-width` for Firefox; subtle rounded track/thumb matching theme)
+- [X] T092 Add right padding to messages container in `src/frontend/HealthPlanChat.Web/wwwroot/css/app.css` to create spacing between user message bubbles and scrollbar
 
 ### Documentation & Configuration
 
