@@ -56,3 +56,19 @@ resource "azapi_resource" "search_storage_role" {
     }
   }
 }
+
+# Allow developer to manage blobs in Storage
+resource "azapi_resource" "developer_storage_role" {
+  count     = var.developer_principal_id != "" ? 1 : 0
+  type      = "Microsoft.Authorization/roleAssignments@2022-04-01"
+  name      = uuidv5("dns", "${var.developer_principal_id}-storage-blob-contributor")
+  parent_id = azapi_resource.storage_account.id
+
+  body = {
+    properties = {
+      roleDefinitionId = "/subscriptions/${data.azurerm_subscription.current.subscription_id}/providers/Microsoft.Authorization/roleDefinitions/ba92f5b4-2d11-453d-a403-e96b0029c9fe" # Storage Blob Data Contributor
+      principalId      = var.developer_principal_id
+      principalType    = "User"
+    }
+  }
+}
