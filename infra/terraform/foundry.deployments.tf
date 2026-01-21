@@ -1,9 +1,9 @@
 # Azure AI Foundry Model Deployments for Health Plan Chat
 
-# GPT-5-mini deployment for chat completions
-resource "azapi_resource" "gpt5_mini_deployment" {
+# GPT-4o deployment for chat completions (supports azure_ai_search tool)
+resource "azapi_resource" "gpt4o_deployment" {
   type      = "Microsoft.CognitiveServices/accounts/deployments@2024-10-01"
-  name      = "gpt-5-mini"
+  name      = "gpt-4o"
   parent_id = azapi_resource.ai_services.id
 
   body = {
@@ -14,8 +14,8 @@ resource "azapi_resource" "gpt5_mini_deployment" {
     properties = {
       model = {
         format  = "OpenAI"
-        name    = "gpt-5-mini"
-        version = "2025-08-07"
+        name    = "gpt-4o"
+        version = "2024-11-20"
       }
       raiPolicyName = "Microsoft.DefaultV2"
     }
@@ -49,7 +49,7 @@ resource "azapi_resource" "embedding_deployment" {
   }
 
   # Ensure deployments are created sequentially to avoid conflicts
-  depends_on = [azapi_resource.gpt5_mini_deployment]
+  depends_on = [azapi_resource.gpt4o_deployment]
 
   timeouts {
     create = "30m"

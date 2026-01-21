@@ -18,7 +18,7 @@ public sealed class FoundryOptions
     /// <summary>
     /// Model deployment name for chat completions. Default: "gpt-5-mini".
     /// </summary>
-    public string ChatModelDeployment { get; set; } = "gpt-5-mini";
+    public string ChatModelDeployment { get; set; } = "gpt-4o";
 
     /// <summary>
     /// Model deployment name for embeddings. Default: "text-embedding-3-small".

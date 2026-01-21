@@ -32,8 +32,8 @@ output "redis_hostname" {
 }
 
 output "foundry_endpoint" {
-  description = "Azure AI Foundry endpoint"
-  value       = azapi_resource.ai_services.output.properties.endpoint
+  description = "Azure AI Foundry project endpoint for Persistent Agents API"
+  value       = "https://${azapi_resource.ai_services.name}.services.ai.azure.com/api/projects/${azapi_resource.foundry_project.name}"
 }
 
 # GitHub Actions WIF outputs
