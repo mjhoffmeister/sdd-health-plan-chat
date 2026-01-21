@@ -3,6 +3,7 @@
   <Project Path="HealthPlanChat.Core.UnitTests/HealthPlanChat.Core.UnitTests.csproj" />
   <Project Path="HealthPlanChat.Core/HealthPlanChat.Core.csproj" />
   <Project Path="HealthPlanChat.Infrastructure.AgentFramework/HealthPlanChat.Infrastructure.AgentFramework.csproj" />
+  <Project Path="HealthPlanChat.Infrastructure.AgentFramework.UnitTests/HealthPlanChat.Infrastructure.AgentFramework.UnitTests.csproj" />
   <Project Path="HealthPlanChat.Infrastructure.IntegrationTests/HealthPlanChat.Infrastructure.IntegrationTests.csproj" />
   <Project Path="HealthPlanChat.Infrastructure.Prompting.UnitTests/HealthPlanChat.Infrastructure.Prompting.UnitTests.csproj" />
   <Project Path="HealthPlanChat.Infrastructure.Prompting/HealthPlanChat.Infrastructure.Prompting.csproj" />

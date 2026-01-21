@@ -1,0 +1,130 @@
+@using System.Text.RegularExpressions
+
+@((MarkupString)RenderedHtml)
+
+@code {
+    /// <summary>
+    /// The raw markdown text to render.
+    /// </summary>
+    [Parameter]
+    public string? Text { get; set; }
+
+    private string RenderedHtml => RenderMarkdown(Text);
+
+    /// <summary>
+    /// Renders basic markdown to HTML. Supports:
+    /// - **bold** and __bold__
+    /// - *italic* and _italic_
+    /// - Unordered lists (- item)
+    /// - Numbered lists (1. item)
+    /// - Line breaks
+    /// </summary>
+    private static string RenderMarkdown(string? markdown)
+    {
+        if (string.IsNullOrWhiteSpace(markdown))
+        {
+            return string.Empty;
+        }
+
+        var result = System.Web.HttpUtility.HtmlEncode(markdown);
+
+        // Process bold: **text** or __text__
+        result = Regex.Replace(result, @"\*\*(.+?)\*\*", "<strong>$1</strong>");
+        result = Regex.Replace(result, @"__(.+?)__", "<strong>$1</strong>");
+
+        // Process italic: *text* or _text_ (but not inside URLs or already processed bold)
+        // Use negative lookbehind/lookahead to avoid matching inside bold tags
+        result = Regex.Replace(result, @"(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)", "<em>$1</em>");
+        result = Regex.Replace(result, @"(?<!_)_(?!_)(.+?)(?<!_)_(?!_)", "<em>$1</em>");
+
+        // Process unordered lists: lines starting with "- "
+        result = ProcessUnorderedLists(result);
+
+        // Process ordered lists: lines starting with "1. ", "2. ", etc.
+        result = ProcessOrderedLists(result);
+
+        // Convert remaining line breaks to <br> (but not inside lists)
+        result = Regex.Replace(result, @"(?<!</li>)\n(?!<[uo]l>|<li>|</[uo]l>)", "<br />\n");
+
+        return result;
+    }
+
+    private static string ProcessUnorderedLists(string text)
+    {
+        var lines = text.Split('\n');
+        var result = new System.Text.StringBuilder();
+        var inList = false;
+
+        foreach (var line in lines)
+        {
+            var trimmedLine = line.TrimStart();
+            if (trimmedLine.StartsWith("- "))
+            {
+                if (!inList)
+                {
+                    result.AppendLine("<ul>");
+                    inList = true;
+                }
+                var content = trimmedLine[2..]; // Remove "- "
+                result.AppendLine($"<li>{content}</li>");
+            }
+            else
+            {
+                if (inList)
+                {
+                    result.AppendLine("</ul>");
+                    inList = false;
+                }
+                result.AppendLine(line);
+            }
+        }
+
+        if (inList)
+        {
+            result.AppendLine("</ul>");
+        }
+
+        return result.ToString().TrimEnd('\r', '\n');
+    }
+
+    private static string ProcessOrderedLists(string text)
+    {
+        var lines = text.Split('\n');
+        var result = new System.Text.StringBuilder();
+        var inList = false;
+        var orderedListPattern = new Regex(@"^\d+\.\s+(.*)$");
+
+        foreach (var line in lines)
+        {
+            var trimmedLine = line.TrimStart();
+            var match = orderedListPattern.Match(trimmedLine);
+
+            if (match.Success)
+            {
+                if (!inList)
+                {
+                    result.AppendLine("<ol>");
+                    inList = true;
+                }
+                var content = match.Groups[1].Value;
+                result.AppendLine($"<li>{content}</li>");
+            }
+            else
+            {
+                if (inList)
+                {
+                    result.AppendLine("</ol>");
+                    inList = false;
+                }
+                result.AppendLine(line);
+            }
+        }
+
+        if (inList)
+        {
+            result.AppendLine("</ol>");
+        }
+
+        return result.ToString().TrimEnd('\r', '\n');
+    }
+}

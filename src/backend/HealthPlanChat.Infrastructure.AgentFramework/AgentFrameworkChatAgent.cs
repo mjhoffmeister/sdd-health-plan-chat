@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Azure.AI.Agents.Persistent;
 using Azure.AI.Projects;
 using Azure.Identity;
@@ -151,15 +152,18 @@ public sealed class AgentFrameworkChatAgent : IChatAgent
                     // Extract text content and citations
                     var (responseText, references) = ExtractResponseAndCitations(assistantMessage);
 
-                    // Determine answer type from response text
+                    // Determine answer type from response text (before sanitization)
                     var answerType = DetermineAnswerType(responseText, references);
+
+                    // Sanitize response text: strip answer type labels and citation markers
+                    var sanitizedText = ResponseTextSanitizer.Sanitize(responseText);
 
                     _logger.LogInformation(
                         "Response generated. AnswerType: {AnswerType}, ReferenceCount: {ReferenceCount}",
                         answerType,
                         references.Count);
 
-                    return new ChatAgentResponse(responseText, answerType, references);
+                    return new ChatAgentResponse(sanitizedText, answerType, references);
                 }
                 finally
                 {

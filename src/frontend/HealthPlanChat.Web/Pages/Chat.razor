@@ -59,7 +59,14 @@
                     <span class="timestamp">@message.Timestamp.ToShortTimeString()</span>
                 </div>
                 <div class="message-content">
-                    @message.Text
+                    @if (message.Role == MessageRole.Assistant)
+                    {
+                        <MarkdownRenderer Text="@message.Text" />
+                    }
+                    else
+                    {
+                        @message.Text
+                    }
                 </div>
                 @if (message.AnswerType.HasValue)
                 {

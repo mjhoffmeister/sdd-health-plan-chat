@@ -191,6 +191,16 @@
 
 **Purpose**: Infrastructure, deployment, and demo hardening. **These tasks are optional stretch goals** — the MVP is functional without them.
 
+### Response Formatting (US1/US2 Polish)
+
+- [X] T085 [P] Strip answer type labels (`**[GROUNDED]**`, `**[GENERAL GUIDANCE]**`) from response text after extraction in `src/backend/HealthPlanChat.Infrastructure.AgentFramework/AgentFrameworkChatAgent.cs` (label is already captured in `AnswerType`; raw marker should not appear in `AnswerText`)
+- [X] T086 [P] Strip/replace citation markers (e.g., `【3:0†source】`) from response text in `src/backend/HealthPlanChat.Infrastructure.AgentFramework/AgentFrameworkChatAgent.cs` (citations are already captured in `References`; raw markers should not appear in `AnswerText`)
+- [X] T087 [P] Add markdown rendering for assistant messages in `src/frontend/HealthPlanChat.Web/Components/MarkdownRenderer.razor` (render `**bold**`, `*italic*`, lists, etc. using a lightweight markdown parser like Markdig or simple regex for bold/italic only)
+- [X] T088 Update `Chat.razor` to use `MarkdownRenderer` for assistant message content in `src/frontend/HealthPlanChat.Web/Pages/Chat.razor`
+- [X] T089 Add unit tests for response text sanitization (label stripping, citation marker removal) in `src/backend/HealthPlanChat.Infrastructure.AgentFramework.UnitTests/` or existing test project
+
+### Documentation & Configuration
+
 - [ ] T060 Add runtime configuration docs in `specs/001-health-plan-chat/quickstart.md` (Azure env vars and expected settings)
 - [ ] T061 Validate Quickstart end-to-end and update `specs/001-health-plan-chat/quickstart.md` with final commands (include a short demo checklist using `data/demo-questions.json` for SC-001 spot-checks)
 - [ ] T062 Add Core unit tests for `ChatInteractor` (labeling: Grounded vs GeneralGuidance; references shape; deterministic behavior) in `src/backend/HealthPlanChat.Core.UnitTests/UseCases/Chat/ChatInteractorTests.cs`
