@@ -81,7 +81,7 @@ resource "azapi_resource" "app_service" {
           },
           {
             name  = "Foundry__SearchConnectionId"
-            value = azapi_resource.foundry_search_connection.id
+            value = azapi_resource.foundry_search_connection.name
           },
           {
             name  = "Foundry__SearchIndexName"
