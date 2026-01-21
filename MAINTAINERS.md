@@ -18,6 +18,13 @@ Current phase tags on `origin`:
 - `phase/05-implement/01-setup` = start of implement (Phase 1: Setup)
 - `phase/05-implement/02-foundational` = start of implement (Phase 2: Foundational)
 - `phase/05-implement/03-ask-plan-questions` = start of implement (Phase 3: Ask Plan Questions)
+- `phase/05-implement/04-handle-missing-answers` = start of implement (Phase 4: Handle Missing Answers)
+- `phase/05-implement/05-ui` = start of implement (Phase 5: UI)
+- `phase/05-implement/06-documentation` = start of implement (Phase 6: Documentation)
+
+Other milestone tag(s) on `origin`:
+
+- `demo-complete` = demo complete (not a phase start tag)
 
 ### Hierarchical tags ("folders")
 
