@@ -199,6 +199,11 @@
 - [X] T088 Update `Chat.razor` to use `MarkdownRenderer` for assistant message content in `src/frontend/HealthPlanChat.Web/Pages/Chat.razor`
 - [X] T089 Add unit tests for response text sanitization (label stripping, citation marker removal) in `src/backend/HealthPlanChat.Infrastructure.AgentFramework.UnitTests/` or existing test project
 
+### Chat UX Polish (US3)
+
+- [X] T090 [P] Auto-scroll messages container to bottom when new messages arrive or loading state changes in `src/frontend/HealthPlanChat.Web/Pages/Chat.razor` (use JS interop `scrollIntoView` or set `scrollTop` after render; scroll on: user sends message, assistant response received, loading indicator appears)
+- [X] T091 [P] Style scrollbar for messages container in `src/frontend/HealthPlanChat.Web/wwwroot/css/app.css` (use `::-webkit-scrollbar` for Chromium/Safari with theme-aware colors; add `scrollbar-color` and `scrollbar-width` for Firefox; subtle rounded track/thumb matching theme)
+
 ### Documentation & Configuration
 
 - [ ] T060 Add runtime configuration docs in `specs/001-health-plan-chat/quickstart.md` (Azure env vars and expected settings)

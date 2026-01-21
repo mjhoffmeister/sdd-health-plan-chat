@@ -6,6 +6,7 @@
 @using HealthPlanChat.Web.Layout
 @inject ChatSessionService ChatSession
 @inject ThemeService ThemeService
+@inject IJSRuntime JS
 @implements IDisposable
 
 <PageTitle>Health Plan Chat</PageTitle>
@@ -115,10 +116,12 @@
 @code {
     private string _inputMessage = string.Empty;
     private ElementReference _messagesContainer;
+    private int _previousMessageCount = 0;
+    private bool _wasLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
-        ChatSession.OnStateChanged += StateHasChanged;
+        ChatSession.OnStateChanged += HandleStateChanged;
         ThemeService.OnThemeChanged += HandleThemeChanged;
 
         // Initialize theme first (does not affect chat state)
@@ -128,6 +131,33 @@
         if (!ChatSession.HasSession)
         {
             await ChatSession.InitializeSessionAsync();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Auto-scroll when new messages arrive or loading state changes
+        var currentMessageCount = ChatSession.Messages.Count;
+        var isLoading = ChatSession.IsLoading;
+
+        if (currentMessageCount > _previousMessageCount || (isLoading && !_wasLoading) || (!isLoading && _wasLoading))
+        {
+            await ScrollToBottomAsync();
+        }
+
+        _previousMessageCount = currentMessageCount;
+        _wasLoading = isLoading;
+    }
+
+    private async Task ScrollToBottomAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("scrollToBottom", _messagesContainer);
+        }
+        catch (JSException)
+        {
+            // Ignore JS interop errors (e.g., during prerendering)
         }
     }
 
@@ -148,6 +178,11 @@
         await ChatSession.SendMessageAsync(message);
     }
 
+    private void HandleStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
     private void HandleThemeChanged()
     {
         // Theme change does not affect chat history - just trigger UI re-render
@@ -156,7 +191,7 @@
 
     public void Dispose()
     {
-        ChatSession.OnStateChanged -= StateHasChanged;
+        ChatSession.OnStateChanged -= HandleStateChanged;
         ThemeService.OnThemeChanged -= HandleThemeChanged;
     }
 }
