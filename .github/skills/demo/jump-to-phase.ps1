@@ -76,17 +76,17 @@ function Get-CurrentPhaseTag {
 }
 
 function Resolve-PhaseTag {
-    param([string]$Input)
+    param([string]$PhaseInput)
 
     # Check if it's already a full tag
-    if ($Input -match "^phase/") {
-        return $Input
+    if ($PhaseInput -match "^phase/") {
+        return $PhaseInput
     }
 
     # Search by number or name
-    $inputLower = $Input.ToLower()
+    $inputLower = $PhaseInput.ToLower()
     foreach ($p in $phases) {
-        if ($p.Number -eq $Input) {
+        if ($p.Number -eq $PhaseInput) {
             return $p.Tag
         }
         if ($p.Names -contains $inputLower) {
