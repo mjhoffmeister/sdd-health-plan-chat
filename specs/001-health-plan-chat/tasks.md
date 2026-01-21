@@ -207,8 +207,8 @@
 
 ### Documentation & Configuration
 
-- [ ] T061 Validate Quickstart end-to-end and update `specs/001-health-plan-chat/quickstart.md` with final commands (include a short demo checklist using `data/demo-questions.json` for SC-001 spot-checks)
-- [ ] T062 Add Core unit tests for `ChatInteractor` (labeling: Grounded vs GeneralGuidance; references shape; deterministic behavior) in `src/backend/HealthPlanChat.Core.UnitTests/UseCases/Chat/ChatInteractorTests.cs`
+- [X] T061 Validate Quickstart end-to-end and update `specs/001-health-plan-chat/quickstart.md` with final commands (include a short demo checklist using `data/demo-questions.json` for SC-001 spot-checks)
+- [X] T062 Add Core unit tests for `ChatInteractor` (labeling: Grounded vs GeneralGuidance; references shape; deterministic behavior) in `src/backend/HealthPlanChat.Core.UnitTests/UseCases/Chat/ChatInteractorTests.cs`
 
 ---
 
