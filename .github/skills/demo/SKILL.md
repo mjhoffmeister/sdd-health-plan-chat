@@ -48,7 +48,16 @@ From within the live worktree, jump between phases while preserving work:
 .\.github\skills\demo\jump-to-phase.ps1 -Phase <phase>
 ```
 
+**Safety:**
+- The script refuses to run on `main`/`master`.
+- In a demo worktree, it runs without extra prompts.
+- Outside a worktree, it prints a warning (because changes may affect your main repo).
+
 **State preservation:** When jumping away from a phase, uncommitted changes are stashed. When returning, they're automatically restored.
+
+**Stash identity:** Stashes are labeled as `demo[<name>]:<phase-tag>`.
+- If you are on a `demo/<name>` branch, `<name>` comes from the branch.
+- Otherwise (common in spec-kit demos), `<name>` is derived from the demo folder name (e.g., `../sdd-health-plan-chat-dry-run/live` → `dry-run`).
 
 ### Phase Identifiers
 
