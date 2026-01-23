@@ -119,7 +119,7 @@ function Remove-DemoWorktrees {
     }
 
     # Clear demo stashes for this specific demo
-    $stashes = git stash list 2>$null | Where-Object { $_ -match "demo\[$demoName\]:phase/" }
+    $stashes = git stash list 2>$null | Where-Object { $_ -match "demo\[$demoName\]:" }
     if ($stashes) {
         Write-Host "  Clearing stashes for demo '$demoName'"
         # Process in reverse order to maintain correct indices
