@@ -40,12 +40,8 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# Detect demo name from current branch (demo/<name>)
+# Capture current branch (may be empty when detached)
 $currentBranch = git branch --show-current 2>$null
-$demoName = $null
-if ($currentBranch -match "^demo/(.+)$") {
-    $demoName = $Matches[1]
-}
 
 # Phase tags in order with metadata for lookup
 $phases = @(
@@ -63,16 +59,75 @@ $phases = @(
 )
 
 function Get-CurrentPhaseTag {
-    # Try to determine current phase from HEAD
-    $currentCommit = git rev-parse HEAD 2>$null
-    foreach ($p in $phases) {
-        $tagCommit = git rev-parse "$($p.Tag)^{commit}" 2>$null
-        if ($tagCommit -eq $currentCommit) {
-            return $p.Tag
+    $tag = git describe --tags --match "phase/*" --abbrev=0 2>$null
+    if ($tag) {
+        return $tag.Trim()
+    }
+
+    return "phase/unknown"
+}
+
+function Test-IsWorktree {
+    $repoRoot = git rev-parse --show-toplevel 2>$null
+    if (-not $repoRoot) {
+        return $false
+    }
+
+    $gitPath = Join-Path $repoRoot ".git"
+    if (Test-Path $gitPath) {
+        $item = Get-Item $gitPath -ErrorAction SilentlyContinue
+        if ($item -and -not $item.PSIsContainer) {
+            return $true
         }
     }
-    # If not on a tag, return a generic identifier
-    return "unknown"
+
+    $gitDir = git rev-parse --git-dir 2>$null
+    if ($gitDir) {
+        $normalized = $gitDir.Trim() -replace "\\", "/"
+        return $normalized -match "/worktrees/"
+    }
+
+    return $false
+}
+
+function Test-IsMainBranch {
+    $branch = git branch --show-current 2>$null
+    if (-not $branch) {
+        return $false
+    }
+
+    $branch = $branch.Trim()
+    return $branch -eq "main" -or $branch -eq "master"
+}
+
+function Get-DemoName {
+    $branch = git branch --show-current 2>$null
+    if ($branch -match "^demo/(.+)$") {
+        return $Matches[1]
+    }
+
+    if (-not (Test-IsWorktree)) {
+        return "local"
+    }
+
+    $repoRoot = git rev-parse --show-toplevel 2>$null
+    $gitCommonDir = git rev-parse --git-common-dir 2>$null
+    if (-not $repoRoot -or -not $gitCommonDir) {
+        return "unknown"
+    }
+
+    $repoRoot = $repoRoot.Trim() -replace "/", "\\"
+    $gitCommonDir = $gitCommonDir.Trim() -replace "/", "\\"
+
+    $repoName = Split-Path (Split-Path $gitCommonDir -Parent) -Leaf
+    $demoFolder = Split-Path $repoRoot -Parent
+    $demoFolderName = Split-Path $demoFolder -Leaf
+
+    if ($repoName -and $demoFolderName -like "$repoName-*") {
+        return $demoFolderName.Substring($repoName.Length + 1)
+    }
+
+    return $demoFolderName
 }
 
 function Resolve-PhaseTag {
@@ -112,9 +167,9 @@ function Get-DemoStashIndex {
     return -1
 }
 
-function Test-IsDemoWorktree {
-    $branch = git branch --show-current 2>$null
-    return $branch -match "^demo/"
+$demoName = Get-DemoName
+if (-not $demoName) {
+    $demoName = "unknown"
 }
 
 # Resolve target phase
@@ -132,13 +187,13 @@ if (-not $tagExists) {
 }
 
 # Warn if not in a demo worktree
-if (-not (Test-IsDemoWorktree)) {
-    Write-Warning "Not in a demo worktree (demo/<name> branch). Changes here may affect the main repository."
-    $confirm = Read-Host "Continue anyway? (y/N)"
-    if ($confirm -ne 'y') {
-        Write-Host "Aborted." -ForegroundColor Yellow
-        exit 0
-    }
+if (Test-IsMainBranch) {
+    Write-Error "Refusing to run on 'main'/'master'. Use a demo worktree or a non-main branch."
+    exit 1
+}
+
+if (-not (Test-IsWorktree)) {
+    Write-Warning "Not in a demo worktree. Changes here may affect the main repository."
 }
 
 $currentTag = Get-CurrentPhaseTag
