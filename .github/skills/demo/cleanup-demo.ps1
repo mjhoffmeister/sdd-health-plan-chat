@@ -89,7 +89,7 @@ function Remove-Demo {
 
     # Remove stashes
     if (-not $KeepStashes) {
-        $stashes = git stash list 2>$null | Where-Object { $_ -match "demo\[$DemoName\]:phase/" }
+        $stashes = git stash list 2>$null | Where-Object { $_ -match "demo\[$DemoName\]:" }
         if ($stashes) {
             Write-Host "  Clearing stashes for demo '$DemoName'"
             $indices = @()
