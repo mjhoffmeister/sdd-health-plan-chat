@@ -1,85 +1,59 @@
-
 # Using Spec Kit and GitHub Copilot to Build a Health Plan Chat App
 
 This repository is a staged demo of spec-driven development (SDD) using
 **Spec Kit** and **GitHub Copilot**. It shows how written product intent
-(constitution, spec, plan) guides implementation so AI-assisted development
+(constitution, spec, plan) can guide implementation so AI-assisted development
 stays aligned with requirements, quality, and testability.
 
-It's organized as a sequence you can present end-to-end, or jump ahead during a
+It’s organized as a sequence you can present end-to-end, or jump ahead during a
 live session while still keeping completed, realistic artifacts for earlier
 phases.
 
 ## Demo Phases
 
-**init → constitution → spec → plan → implement**
+**init → constitution → spec → plan → tasks → implement**
 
 Each phase produces durable artifacts that constrain and guide the next phase.
 
-## For Demoers (jump ahead + rehearse safely)
+## Exploring the staged demo
 
-To see what checkpoint you're on:
+This repo supports a staged demo workflow where you can:
 
-`git tag --points-at HEAD`
+- bootstrap a self-contained demo workspace,
+- jump between phase checkpoints during a live session,
+- open any phase checkpoint to browse what “done” looks like,
+- clean up when you’re finished.
 
-### Phase tags (start-of-phase checkpoints)
+The recommended interface is GitHub Copilot (agent mode). The underlying scripts are considered an implementation detail.
 
-This repo uses Git tags to mark the start of each demo phase so you can
-reset/jump without accidentally "dirtying" a checkpoint.
+### 1) Bootstrap a demo workspace
 
-- `phase/00-init` = start of init (before you run `specify init`)
+In GitHub Copilot (agent mode), ask Copilot to bootstrap a demo workspace. Example prompt:
 
-More phase tags will be added as the demo is built out.
+- “Bootstrap a new demo called `my-demo`.”
 
-### Jump to a phase (fast)
+This creates a demo directory containing:
 
-To return to the start of init:
+- a `live/` workspace (for experimentation and live phase jumps)
+- one or more `phase-*` checkpoint folders (open these folders to jump to a phase without the skill)
 
-`git fetch --tags`
+### 2) Jump to a phase
 
-`git switch --detach phase/00-init`
+In GitHub Copilot (agent mode), ask Copilot to jump to a phase. Example prompts:
 
-Tip: using `--detach` avoids accidentally moving a branch pointer while
-presenting.
+- “Jump to the plan phase.”
+- “Jump to phase 04 (tasks).”
 
-### Smoothest live demo: worktrees (multiple phase folders)
+### 3) Explore a phase by opening its folder
 
-Git worktrees let you have multiple folders checked out at different phases at
-the same time, so you can jump by switching windows instead of switching
-branches.
+If you just want to browse a checkpoint without switching anything, open a `phase-*` checkpoint folder directly in VS Code.
 
-From the repo root:
+### 4) Clean up
 
-`git fetch --tags`
+When you’re done, ask Copilot (agent mode) to clean up the demo workspace. Example prompts:
 
-Create a dedicated "live" folder you can edit freely:
-
-`git switch -c demo/live phase/00-init`
-
-If you already created `demo/live` before, use:
-
-`git switch demo/live`
-
-`git worktree add ..\sdd-health-plan-chat--live demo/live`
-
-Optional: create a "checkpoint view" folder that you never edit:
-
-`git worktree add --detach ..\sdd-health-plan-chat--00-init phase/00-init`
-
-### Rehearsal reset (start over quickly)
-
-To run the demo repeatedly, reset your **live** folder back to the start of
-init (this discards any edits in the live folder):
-
-`cd ..\sdd-health-plan-chat--live`
-
-`git reset --hard phase/00-init`
-
-`git clean -fd`
-
-Then rerun init:
-
-`specify init --here --script ps --ai copilot`
+- “Clean up the `my-demo` workspace.”
+- “Clean up all demo workspaces.”
 
 ## Init Phase (Phase 00)
 
@@ -100,3 +74,100 @@ Upgrade:
 Run from PowerShell (`pwsh`):
 
 `specify init --here --script ps --ai copilot`
+
+## Constitution Phase (Phase 01)
+
+Goal: create and ratify the project constitution in
+`.specify/memory/constitution.md`.
+
+### Generate the constitution
+
+This repo includes a reusable Copilot prompt for constitution generation.
+In GitHub Copilot (agent mode), run:
+
+`/healthplanchat-constitution`
+
+Then review and refine the output in `.specify/memory/constitution.md`.
+
+## Spec Phase (Phase 02)
+
+Goal: create the first feature specification in
+`specs/<feature-branch>/spec.md`.
+
+Note: Spec Kit scripts write to `specs/<feature-branch>/...` based on your
+current git branch name. If you are on `main`, switch to your feature branch
+(e.g., `001-health-plan-chat`) before generating spec/plan/tasks artifacts. If
+you are not using git, set `SPECIFY_FEATURE` to the feature folder name.
+
+### Generate the spec
+
+This repo includes a reusable Copilot prompt for spec generation. In GitHub Copilot (agent mode), run:
+
+`/healthplanchat-specify`
+
+## Plan Phase (Phase 03)
+
+Goal: create the first implementation plan in `specs/<feature-branch>/plan.md`.
+
+### Generate the plan
+
+This repo includes a reusable Copilot prompt for plan generation. In GitHub Copilot (agent mode), run:
+
+`/healthplanchat-plan`
+
+## Tasks Phase (Phase 04)
+
+Goal: turn the plan into actionable implementation tasks in
+`specs/<feature-branch>/tasks.md`.
+Note: If you are on `main`, switch to your feature branch (e.g.,
+`001-health-plan-chat`) before running `/speckit.tasks`, or set `SPECIFY_FEATURE`
+to the feature folder name. The default branch may already include a sample
+generated tasks file.
+
+### Generate the tasks
+
+Use Spec Kit’s built-in tasks agent (no additional repo-specific prompt is
+needed):
+
+`/speckit.tasks`
+
+Optional: if you want to create GitHub issues from tasks, run:
+
+`/speckit.taskstoissues`
+
+## Implement Phase (Phase 05)
+
+Goal: implement the feature by executing tasks in `specs/<feature-branch>/tasks.md`.
+
+### Start implementation: Phase 1 (Setup)
+
+1) Create a working branch for coding (recommended):
+
+`git switch -c impl/setup`
+
+2) Implement the Setup tasks (Phase 1) from `specs/001-health-plan-chat/tasks.md`:
+
+- T001–T007
+
+3) Check in your Setup implementation.
+
+### Pre-flight
+
+- Ensure you are on your feature branch (e.g., `001-health-plan-chat`) so Spec Kit writes to the right `specs/<feature-branch>/...` folder, or set `SPECIFY_FEATURE` to the feature folder name.
+- Confirm you have a generated tasks file at `specs/<feature-branch>/tasks.md`.
+
+Optional quality gate (recommended before writing code):
+
+`/speckit.analyze`
+
+If it reports CRITICAL issues, resolve those before continuing.
+
+### Implement tasks
+
+Use Spec Kit’s built-in implement agent:
+
+`/speckit.implement`
+
+In your prompt, specify which task IDs to implement (for example: “Implement T002–T006”). For smoother progress, implement in small batches and keep the working tree green (build/tests passing) between batches.
+
+Tip: tasks marked with `[P]` are intended to be parallelizable; for a solo demo, you can still implement them serially.
