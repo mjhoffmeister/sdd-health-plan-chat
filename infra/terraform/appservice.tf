@@ -10,8 +10,8 @@ resource "azapi_resource" "app_service_plan" {
   body = {
     kind = "linux"
     sku = {
-      name = "F1"
-      tier = "Free"
+      name = "B1"
+      tier = "Basic"
     }
     properties = {
       reserved = true # Required for Linux
@@ -38,7 +38,7 @@ resource "azapi_resource" "app_service" {
       httpsOnly    = true
       siteConfig = {
         linuxFxVersion = "DOTNETCORE|10.0"
-        alwaysOn       = false # Basic tier doesn't support alwaysOn
+        alwaysOn       = false # Not enabled to minimize cost; frontend uses retry logic for cold starts
         http20Enabled  = true
         minTlsVersion  = "1.2"
         ftpsState      = "Disabled"

@@ -212,6 +212,22 @@
 
 ---
 
+## Patch: App Service Cold-Start Resilience
+
+**Purpose**: Mitigate long cold-start times causing 5xx errors surfaced to the frontend by upgrading the App Service SKU and adding client-side retry logic.
+
+### Infrastructure
+
+- [X] T093 Upgrade App Service Plan from F1 (Free) to B1 (Basic) in `infra/terraform/appservice.tf` (change SKU name/tier)
+
+### Frontend
+
+- [X] T095 Add exponential back-off retry logic in `src/frontend/HealthPlanChat.Web/Services/ApiClient.cs` for transient 5xx/network errors during `SendMessageAsync` (retry up to ~45s with exponential delay; handle 502/503/504 and `HttpRequestException`)
+
+**Checkpoint**: Frontend tolerates backend cold starts without hard 500 errors.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

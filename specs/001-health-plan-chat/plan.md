@@ -17,10 +17,11 @@ Approach: retrieval-augmented generation (RAG) over synthetic plan JSON document
 **Primary Dependencies**: ASP.NET Core minimal APIs; Blazor WebAssembly; Agent Framework (`Microsoft.Agents.AI` `1.0.0-preview.260108.1`); Azure AI Search SDK; Azure Storage SDK; Azure Managed Redis client (`Microsoft.Azure.StackExchangeRedis`); FluentResults  
 **Storage**: Repo-backed synthetic plan JSON (source-of-truth) + Azure Blob Storage (for indexing); Azure AI Search (vector/keyword index); Azure Managed Redis (Redis Enterprise via AzAPI `Microsoft.Cache/redisEnterprise@2025-04-01` + required `Microsoft.Cache/redisEnterprise/databases@2025-04-01`) (session chat history)  
 **Testing**: xUnit + FluentAssertions + Moq (Core); minimal API integration tests (later); optional bUnit for UI  
-**Target Platform**: Azure App Service (backend API) + Azure Static Web Apps (frontend)
+**Target Platform**: Azure App Service (backend API, **B1 SKU**) + Azure Static Web Apps (frontend)
 **Project Type**: web (frontend + backend + IaC)  
 **Performance Goals**: demo responsiveness: p95 end-to-end API latency for `/api/chat` under 5s for at least 95% of questions (SC-004), measured server-side from request start to response serialization  
 **Constraints**: no secrets in repo; safe logging; deterministic core logic; anonymous users; grounded vs general guidance labeling required; deployments (including first deployments) run via GitHub Actions only  
+**Frontend Resilience**: The Blazor WASM client implements exponential back-off retry (up to ~45s) for transient 5xx responses and network errors to tolerate App Service cold starts without surfacing hard failures to users.  
 **IaC Provider Pinning**: Terraform MUST use the AzAPI provider pinned to `2.8.0` (do not float provider versions).
 **Terraform State**: Use Pattern 2 (self-bootstrapping pipeline) so environments are repeatable: the GitHub Actions infra workflow bootstraps the `azurerm` backend storage (RG/SA/container + RBAC for the WIF identity) before `terraform init/plan/apply`.
 **Scale/Scope**: single-demo environment; typical sessions ~10+ messages (SC-005)
