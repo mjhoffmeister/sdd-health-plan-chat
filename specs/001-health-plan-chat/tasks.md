@@ -204,6 +204,7 @@
 - [X] T090 [P] Auto-scroll messages container to bottom when new messages arrive or loading state changes in `src/frontend/HealthPlanChat.Web/Pages/Chat.razor` (use JS interop `scrollIntoView` or set `scrollTop` after render; scroll on: user sends message, assistant response received, loading indicator appears)
 - [X] T091 [P] Style scrollbar for messages container in `src/frontend/HealthPlanChat.Web/wwwroot/css/app.css` (use `::-webkit-scrollbar` for Chromium/Safari with theme-aware colors; add `scrollbar-color` and `scrollbar-width` for Firefox; subtle rounded track/thumb matching theme)
 - [X] T092 Add right padding to messages container in `src/frontend/HealthPlanChat.Web/wwwroot/css/app.css` to create spacing between user message bubbles and scrollbar
+- [X] T096 Update sample prompts in `src/frontend/HealthPlanChat.Web/Pages/Chat.razor` to reflect anonymous multi-plan context (current prompts say "my plan/my deductible" implying a signed-in user; update to ask about available plans, e.g., "What plans are available?", "Compare the HMO and PPO deductibles", "What does the Gold plan cover?")
 
 ### Documentation & Configuration
 
