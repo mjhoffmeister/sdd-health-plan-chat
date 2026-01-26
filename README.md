@@ -15,6 +15,46 @@ phases.
 
 Each phase produces durable artifacts that constrain and guide the next phase.
 
+## Exploring the staged demo
+
+This repo supports a staged demo workflow where you can:
+
+- bootstrap a self-contained demo workspace,
+- jump between phase checkpoints during a live session,
+- open any phase checkpoint to browse what “done” looks like,
+- clean up when you’re finished.
+
+The recommended interface is GitHub Copilot (agent mode). The underlying scripts are considered an implementation detail.
+
+### 1) Bootstrap a demo workspace
+
+In GitHub Copilot (agent mode), ask Copilot to bootstrap a demo workspace. Example prompt:
+
+- “Bootstrap a new demo called `my-demo`.”
+
+This creates a demo directory containing:
+
+- a `live/` workspace (for experimentation and live phase jumps)
+- one or more `phase-*` checkpoint folders (open these folders to jump to a phase without the skill)
+
+### 2) Jump to a phase
+
+In GitHub Copilot (agent mode), ask Copilot to jump to a phase. Example prompts:
+
+- “Jump to the plan phase.”
+- “Jump to phase 04 (tasks).”
+
+### 3) Explore a phase by opening its folder
+
+If you just want to browse a checkpoint without switching anything, open a `phase-*` checkpoint folder directly in VS Code.
+
+### 4) Clean up
+
+When you’re done, ask Copilot (agent mode) to clean up the demo workspace. Example prompts:
+
+- “Clean up the `my-demo` workspace.”
+- “Clean up all demo workspaces.”
+
 ## Init Phase (Phase 00)
 
 Goal: generate the Spec Kit files so you can begin the constitution phase.
@@ -43,7 +83,7 @@ Goal: create and ratify the project constitution in
 ### Generate the constitution
 
 This repo includes a reusable Copilot prompt for constitution generation.
-In Copilot Chat, run:
+In GitHub Copilot (agent mode), run:
 
 `/healthplanchat-constitution`
 
@@ -61,8 +101,7 @@ you are not using git, set `SPECIFY_FEATURE` to the feature folder name.
 
 ### Generate the spec
 
-This repo includes a reusable Copilot prompt for spec generation. In Copilot
-Chat, run:
+This repo includes a reusable Copilot prompt for spec generation. In GitHub Copilot (agent mode), run:
 
 `/healthplanchat-specify`
 
@@ -72,8 +111,7 @@ Goal: create the first implementation plan in `specs/<feature-branch>/plan.md`.
 
 ### Generate the plan
 
-This repo includes a reusable Copilot prompt for plan generation. In Copilot
-Chat, run:
+This repo includes a reusable Copilot prompt for plan generation. In GitHub Copilot (agent mode), run:
 
 `/healthplanchat-plan`
 
