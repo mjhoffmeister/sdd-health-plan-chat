@@ -107,6 +107,9 @@ if ($LASTEXITCODE -eq 0) {
         Write-Error "Failed to update Storage Account network rules for state bootstrap."
         exit 1
     }
+    # Wait for network rule changes to propagate before container operations
+    Write-Host "  Waiting for network rule changes to propagate..." -ForegroundColor Yellow
+    Start-Sleep -Seconds 30
 } else {
     az storage account create `
         --name $StorageAccountName `
@@ -138,6 +141,11 @@ $containerExists = az storage container exists `
     --auth-mode login `
     --query exists -o tsv 2>&1
 
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "  Could not check container existence (network rules may still be propagating). Attempting create..." -ForegroundColor Yellow
+    $containerExists = "unknown"
+}
+
 if ($containerExists -eq "true") {
     Write-Host "  Blob Container already exists." -ForegroundColor Green
 } else {
@@ -145,10 +153,20 @@ if ($containerExists -eq "true") {
         --name $ContainerName `
         --account-name $StorageAccountName `
         --auth-mode login `
-        --output none
+        --output none 2>&1
     if ($LASTEXITCODE -ne 0) {
-        Write-Error "Failed to create Blob Container."
-        exit 1
+        # Retry once after additional wait if network rules are still propagating
+        Write-Host "  Retrying after additional wait..." -ForegroundColor Yellow
+        Start-Sleep -Seconds 15
+        az storage container create `
+            --name $ContainerName `
+            --account-name $StorageAccountName `
+            --auth-mode login `
+            --output none
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to create Blob Container."
+            exit 1
+        }
     }
     Write-Host "  Blob Container created." -ForegroundColor Green
 }
