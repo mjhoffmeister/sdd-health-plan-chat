@@ -68,7 +68,8 @@ public sealed class ApiClient
         => TimeSpan.FromMilliseconds(Math.Min(current.TotalMilliseconds * 2, MaxRetryDelay.TotalMilliseconds));
 
     private static bool IsRetryableStatusCode(System.Net.HttpStatusCode statusCode)
-        => statusCode is System.Net.HttpStatusCode.BadGateway
+        => statusCode is System.Net.HttpStatusCode.InternalServerError
+            or System.Net.HttpStatusCode.BadGateway
             or System.Net.HttpStatusCode.ServiceUnavailable
             or System.Net.HttpStatusCode.GatewayTimeout;
 
