@@ -253,8 +253,8 @@
 
 ### Infrastructure
 
-- [ ] T101 Add `var.ai_location` variable (default: `eastus2`) in `infra/terraform/variables.tf` for AI Services / Foundry region
-- [ ] T102 Update `azapi_resource.ai_services` and `azapi_resource.foundry_project` to use `var.ai_location` instead of `var.location` in `infra/terraform/foundry.tf`
+- [X] T101 Add `var.ai_location` variable (default: `eastus2`) in `infra/terraform/variables.tf` for AI Services / Foundry region
+- [X] T102 Update `azapi_resource.ai_services` and `azapi_resource.foundry_project` to use `var.ai_location` instead of `var.location` in `infra/terraform/foundry.tf`
 
 **Checkpoint**: AI Services and Foundry project recreated in `eastus2`. Persistent Agents API accepts `CreateAgentAsync`. All other resources remain in `centralus`.
 
