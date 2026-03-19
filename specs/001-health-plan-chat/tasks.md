@@ -247,6 +247,19 @@
 
 ---
 
+## Patch: Move Foundry to Agents-Supported Region
+
+**Purpose**: Azure dropped Persistent Agents support from `centralus`. Move AI Services and Foundry project to `eastus2` (Agents-supported) while keeping all other resources in `centralus`.
+
+### Infrastructure
+
+- [ ] T101 Add `var.ai_location` variable (default: `eastus2`) in `infra/terraform/variables.tf` for AI Services / Foundry region
+- [ ] T102 Update `azapi_resource.ai_services` and `azapi_resource.foundry_project` to use `var.ai_location` instead of `var.location` in `infra/terraform/foundry.tf`
+
+**Checkpoint**: AI Services and Foundry project recreated in `eastus2`. Persistent Agents API accepts `CreateAgentAsync`. All other resources remain in `centralus`.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

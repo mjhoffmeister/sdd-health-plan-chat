@@ -6,6 +6,12 @@ variable "location" {
   default     = "centralus"
 }
 
+variable "ai_location" {
+  description = "Azure region for AI Services / Foundry (must support Persistent Agents)"
+  type        = string
+  default     = "eastus2"
+}
+
 variable "environment" {
   description = "Environment name (e.g., demo, dev, prod)"
   type        = string

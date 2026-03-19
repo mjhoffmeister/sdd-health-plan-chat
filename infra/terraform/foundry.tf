@@ -3,7 +3,7 @@
 resource "azapi_resource" "ai_services" {
   type      = "Microsoft.CognitiveServices/accounts@2025-09-01"
   name      = "aif-${local.resource_prefix}-${random_string.suffix.result}"
-  location  = var.location
+  location  = var.ai_location
   parent_id = azapi_resource.resource_group.id
 
   schema_validation_enabled = false  # allowProjectManagement not in schema yet
@@ -34,7 +34,7 @@ resource "azapi_resource" "ai_services" {
 resource "azapi_resource" "foundry_project" {
   type      = "Microsoft.CognitiveServices/accounts/projects@2025-04-01-preview"
   name      = "healthplanchat"
-  location  = var.location
+  location  = var.ai_location
   parent_id = azapi_resource.ai_services.id
 
   identity {
