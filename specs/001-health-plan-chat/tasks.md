@@ -229,6 +229,24 @@
 
 ---
 
+## Patch: Azure AI Agents SDK Upgrade
+
+**Purpose**: Update `Azure.AI.Agents.Persistent` from 1.0.0 to 1.2.0-beta.9 to fix `400 Bad Request` errors from the Foundry Persistent Agents API. The service API evolved server-side and the 1.0.0 SDK sends requests using a wire protocol the service no longer accepts.
+
+### Package Updates
+
+- [X] T097 Update `Azure.AI.Agents.Persistent` from `1.0.0` to `1.2.0-beta.9` in `src/backend/Directory.Packages.props`
+- [X] T098 Remove unused `Microsoft.Agents.AI` and `Azure.AI.Projects` packages from `src/backend/Directory.Packages.props` and `src/backend/HealthPlanChat.Infrastructure.AgentFramework/HealthPlanChat.Infrastructure.AgentFramework.csproj`
+- [X] T099 Bump `Microsoft.Extensions.*` packages from `10.0.1` to `10.0.2` in `src/backend/Directory.Packages.props` (required by transitive dependencies from updated Azure SDK)
+
+### Code Adaptation
+
+- [X] T100 Replace `AIProjectClient` + `GetPersistentAgentsClient()` with direct `PersistentAgentsClient` instantiation in `src/backend/HealthPlanChat.Infrastructure.AgentFramework/AgentFrameworkChatAgent.cs` (recommended pattern in SDK 1.2+)
+
+**Checkpoint**: `CreateAgentAsync` succeeds against the current Foundry Agents API. All existing tests pass.
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using Azure.AI.Agents.Persistent;
-using Azure.AI.Projects;
 using Azure.Identity;
 using HealthPlanChat.Core.Domain.Chat;
 using HealthPlanChat.Core.ExternalInterfaces;
@@ -19,7 +18,7 @@ public sealed class AgentFrameworkChatAgent : IChatAgent
     private readonly ILogger<AgentFrameworkChatAgent> _logger;
     private readonly FoundryOptions _options;
     private readonly PromptBuilder _promptBuilder;
-    private readonly AIProjectClient _projectClient;
+    private readonly PersistentAgentsClient _agentsClient;
 
     public AgentFrameworkChatAgent(
         IOptions<FoundryOptions> options,
@@ -29,9 +28,9 @@ public sealed class AgentFrameworkChatAgent : IChatAgent
         _options = options.Value;
         _promptBuilder = new PromptBuilder();
 
-        // Initialize the AI Project client for Azure AI Foundry
-        _projectClient = new AIProjectClient(
-            new Uri(_options.Endpoint),
+        // Initialize the persistent agents client directly (recommended pattern in SDK 1.2+)
+        _agentsClient = new PersistentAgentsClient(
+            _options.Endpoint,
             new DefaultAzureCredential());
     }
 
@@ -53,9 +52,6 @@ public sealed class AgentFrameworkChatAgent : IChatAgent
             var systemPrompt = _promptBuilder.BuildSystemPrompt();
             var conversationHistory = _promptBuilder.BuildConversationHistory(history);
 
-            // Get the persistent agents client
-            var agentsClient = _projectClient.GetPersistentAgentsClient();
-
             // Configure the Azure AI Search tool resource
             var searchResource = new AzureAISearchToolResource(
                 _options.SearchConnectionId,
@@ -70,7 +66,7 @@ public sealed class AgentFrameworkChatAgent : IChatAgent
             };
 
             // Create the agent definition with search tool
-            PersistentAgent agent = await agentsClient.Administration.CreateAgentAsync(
+            PersistentAgent agent = await _agentsClient.Administration.CreateAgentAsync(
                 model: _options.ChatModelDeployment,
                 name: "HealthPlanAssistant",
                 instructions: systemPrompt,
@@ -81,7 +77,7 @@ public sealed class AgentFrameworkChatAgent : IChatAgent
             try
             {
                 // Create a thread for the conversation
-                PersistentAgentThread thread = await agentsClient.Threads.CreateThreadAsync(
+                PersistentAgentThread thread = await _agentsClient.Threads.CreateThreadAsync(
                     cancellationToken: cancellationToken);
 
                 try
@@ -90,7 +86,7 @@ public sealed class AgentFrameworkChatAgent : IChatAgent
                     foreach (var (role, content) in conversationHistory)
                     {
                         var messageRole = role == "user" ? MessageRole.User : MessageRole.Agent;
-                        await agentsClient.Messages.CreateMessageAsync(
+                        await _agentsClient.Messages.CreateMessageAsync(
                             thread.Id,
                             messageRole,
                             content,
@@ -98,14 +94,14 @@ public sealed class AgentFrameworkChatAgent : IChatAgent
                     }
 
                     // Add the current user message
-                    await agentsClient.Messages.CreateMessageAsync(
+                    await _agentsClient.Messages.CreateMessageAsync(
                         thread.Id,
                         MessageRole.User,
                         userMessage,
                         cancellationToken: cancellationToken);
 
                     // Run the agent
-                    ThreadRun run = await agentsClient.Runs.CreateRunAsync(
+                    ThreadRun run = await _agentsClient.Runs.CreateRunAsync(
                         thread.Id,
                         agent.Id,
                         cancellationToken: cancellationToken);
@@ -114,7 +110,7 @@ public sealed class AgentFrameworkChatAgent : IChatAgent
                     while (run.Status == RunStatus.Queued || run.Status == RunStatus.InProgress)
                     {
                         await Task.Delay(500, cancellationToken);
-                        run = await agentsClient.Runs.GetRunAsync(
+                        run = await _agentsClient.Runs.GetRunAsync(
                             thread.Id,
                             run.Id,
                             cancellationToken: cancellationToken);
@@ -130,7 +126,7 @@ public sealed class AgentFrameworkChatAgent : IChatAgent
                     }
 
                     // Get the messages (response is the latest assistant message)
-                    var messages = agentsClient.Messages.GetMessagesAsync(
+                    var messages = _agentsClient.Messages.GetMessagesAsync(
                         thread.Id,
                         cancellationToken: cancellationToken);
 
@@ -168,13 +164,13 @@ public sealed class AgentFrameworkChatAgent : IChatAgent
                 finally
                 {
                     // Clean up thread
-                    await agentsClient.Threads.DeleteThreadAsync(thread.Id, cancellationToken);
+                    await _agentsClient.Threads.DeleteThreadAsync(thread.Id, cancellationToken);
                 }
             }
             finally
             {
                 // Clean up agent
-                await agentsClient.Administration.DeleteAgentAsync(agent.Id, cancellationToken);
+                await _agentsClient.Administration.DeleteAgentAsync(agent.Id, cancellationToken);
             }
         }
         catch (Exception ex)

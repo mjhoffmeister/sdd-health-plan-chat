@@ -30,7 +30,7 @@ Approach: retrieval-augmented generation (RAG) over synthetic plan JSON document
 
 | Package | Version |
 |---|---|
-| Microsoft.Agents.AI | 1.0.0-preview.260108.1 |
+| Azure.AI.Agents.Persistent | 1.2.0-beta.9 |
 | Azure.Search.Documents | 11.7.0 |
 | Azure.Storage.Blobs | 12.27.0 |
 | Azure.Identity | 1.17.1 |
